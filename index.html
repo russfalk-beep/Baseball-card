@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baseball Card Maker Pro</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto+Condensed:wght@400;700&family=Anton&family=Bebas+Neue&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <svg class="logo-icon" viewBox="0 0 60 60" width="48" height="48">
+                    <circle cx="30" cy="30" r="28" fill="#fff" stroke="#c8102e" stroke-width="2"/>
+                    <path d="M30 2 C20 15, 15 25, 30 30 C45 25, 40 15, 30 2" fill="none" stroke="#c8102e" stroke-width="1.5"/>
+                    <path d="M30 58 C20 45, 15 35, 30 30 C45 35, 40 45, 30 58" fill="none" stroke="#c8102e" stroke-width="1.5"/>
+                    <path d="M14 8 Q20 18, 18 30" fill="none" stroke="#c8102e" stroke-width="1" stroke-dasharray="2,2"/>
+                    <path d="M46 8 Q40 18, 42 30" fill="none" stroke="#c8102e" stroke-width="1" stroke-dasharray="2,2"/>
+                    <path d="M14 52 Q20 42, 18 30" fill="none" stroke="#c8102e" stroke-width="1" stroke-dasharray="2,2"/>
+                    <path d="M46 52 Q40 42, 42 30" fill="none" stroke="#c8102e" stroke-width="1" stroke-dasharray="2,2"/>
+                </svg>
+                <h1>Baseball Card Maker <span>PRO</span></h1>
+            </div>
+            <p class="tagline">Create professional baseball cards at home</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Editor Panel -->
+            <div class="editor-panel">
+                <div class="editor-tabs">
+                    <button class="tab-btn active" data-tab="player">Player Info</button>
+                    <button class="tab-btn" data-tab="photos">Photos</button>
+                    <button class="tab-btn" data-tab="stats">Stats</button>
+                    <button class="tab-btn" data-tab="design">Design</button>
+                </div>
+
+                <!-- Player Info Tab -->
+                <div class="tab-content active" id="tab-player">
+                    <div class="form-group">
+                        <label>Player Name</label>
+                        <input type="text" id="playerName" placeholder="e.g. Mike Trout Jr." maxlength="30">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Team Name</label>
+                            <input type="text" id="teamName" placeholder="e.g. Angels" maxlength="25">
+                        </div>
+                        <div class="form-group">
+                            <label>Position</label>
+                            <select id="position">
+                                <option value="P">Pitcher (P)</option>
+                                <option value="C">Catcher (C)</option>
+                                <option value="1B">First Base (1B)</option>
+                                <option value="2B">Second Base (2B)</option>
+                                <option value="3B">Third Base (3B)</option>
+                                <option value="SS">Shortstop (SS)</option>
+                                <option value="LF">Left Field (LF)</option>
+                                <option value="CF" selected>Center Field (CF)</option>
+                                <option value="RF">Right Field (RF)</option>
+                                <option value="DH">Designated Hitter (DH)</option>
+                                <option value="IF">Infielder (IF)</option>
+                                <option value="OF">Outfielder (OF)</option>
+                                <option value="UT">Utility (UT)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Jersey Number</label>
+                            <input type="text" id="jerseyNumber" placeholder="#27" maxlength="3">
+                        </div>
+                        <div class="form-group">
+                            <label>Season / Year</label>
+                            <input type="text" id="cardYear" placeholder="2026" maxlength="4">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Bats</label>
+                            <select id="bats">
+                                <option value="R">Right</option>
+                                <option value="L">Left</option>
+                                <option value="S">Switch</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Throws</label>
+                            <select id="throws">
+                                <option value="R">Right</option>
+                                <option value="L">Left</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Height</label>
+                            <input type="text" id="height" placeholder="5'10&quot;" maxlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label>Weight</label>
+                            <input type="text" id="weight" placeholder="175 lbs" maxlength="10">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Born</label>
+                            <input type="text" id="birthdate" placeholder="Aug 7, 2015" maxlength="20">
+                        </div>
+                        <div class="form-group">
+                            <label>Hometown</label>
+                            <input type="text" id="hometown" placeholder="Millville, NJ" maxlength="25">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Card Series / Set Name</label>
+                        <input type="text" id="seriesName" placeholder="e.g. Topps, Upper Deck" maxlength="25">
+                    </div>
+                    <div class="form-group">
+                        <label>Card Number</label>
+                        <input type="text" id="cardNumber" placeholder="e.g. 001" maxlength="5">
+                    </div>
+                    <div class="form-group">
+                        <label>Fun Fact / Bio (back of card)</label>
+                        <textarea id="bio" placeholder="Write a short bio or fun fact about the player..." maxlength="250" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <!-- Photos Tab -->
+                <div class="tab-content" id="tab-photos">
+                    <div class="upload-section">
+                        <label class="upload-label">Player Photo</label>
+                        <p class="upload-hint">Upload a photo of the player. Works best with a clear, well-lit shot.</p>
+                        <div class="upload-box" id="playerPhotoUpload">
+                            <input type="file" id="playerPhoto" accept="image/*" hidden>
+                            <div class="upload-placeholder" id="playerPhotoPlaceholder">
+                                <svg viewBox="0 0 64 64" width="48" height="48"><rect x="8" y="12" width="48" height="40" rx="4" fill="none" stroke="#999" stroke-width="2"/><circle cx="24" cy="28" r="6" fill="none" stroke="#999" stroke-width="2"/><path d="M8 44 L24 32 L36 40 L44 34 L56 44" fill="none" stroke="#999" stroke-width="2"/></svg>
+                                <span>Click or drag to upload player photo</span>
+                            </div>
+                            <img id="playerPhotoPreview" class="upload-preview" style="display:none">
+                        </div>
+                        <div class="photo-controls" id="playerPhotoControls" style="display:none">
+                            <label>Zoom</label>
+                            <input type="range" id="playerPhotoZoom" min="0.5" max="3" step="0.05" value="1">
+                            <label>X Position</label>
+                            <input type="range" id="playerPhotoX" min="-200" max="200" step="1" value="0">
+                            <label>Y Position</label>
+                            <input type="range" id="playerPhotoY" min="-200" max="200" step="1" value="0">
+                            <label>Brightness</label>
+                            <input type="range" id="playerBrightness" min="50" max="150" step="1" value="100">
+                            <label>Contrast</label>
+                            <input type="range" id="playerContrast" min="50" max="200" step="1" value="100">
+                            <label>Saturation</label>
+                            <input type="range" id="playerSaturation" min="0" max="200" step="1" value="100">
+                            <div class="checkbox-row">
+                                <input type="checkbox" id="showOnField" checked>
+                                <label for="showOnField">Show baseball field background</label>
+                            </div>
+                            <button class="btn-secondary" id="removePlayerPhoto">Remove Photo</button>
+                        </div>
+                    </div>
+
+                    <div class="upload-section">
+                        <label class="upload-label">Team Logo</label>
+                        <p class="upload-hint">Upload the team logo. PNG with transparency works best.</p>
+                        <div class="upload-box small" id="teamLogoUpload">
+                            <input type="file" id="teamLogo" accept="image/*" hidden>
+                            <div class="upload-placeholder" id="teamLogoPlaceholder">
+                                <svg viewBox="0 0 64 64" width="36" height="36"><circle cx="32" cy="32" r="24" fill="none" stroke="#999" stroke-width="2"/><text x="32" y="38" text-anchor="middle" font-size="16" fill="#999">LOGO</text></svg>
+                                <span>Upload team logo</span>
+                            </div>
+                            <img id="teamLogoPreview" class="upload-preview" style="display:none">
+                        </div>
+                        <div class="photo-controls" id="teamLogoControls" style="display:none">
+                            <label>Logo Size</label>
+                            <input type="range" id="teamLogoSize" min="20" max="120" step="1" value="55">
+                            <button class="btn-secondary" id="removeTeamLogo">Remove Logo</button>
+                        </div>
+                    </div>
+
+                    <div class="upload-section">
+                        <label class="upload-label">Series / Brand Logo (optional)</label>
+                        <p class="upload-hint">e.g. Topps, Upper Deck style logo for top of card.</p>
+                        <div class="upload-box small" id="brandLogoUpload">
+                            <input type="file" id="brandLogo" accept="image/*" hidden>
+                            <div class="upload-placeholder" id="brandLogoPlaceholder">
+                                <svg viewBox="0 0 64 64" width="36" height="36"><rect x="12" y="20" width="40" height="24" rx="4" fill="none" stroke="#999" stroke-width="2"/><text x="32" y="36" text-anchor="middle" font-size="10" fill="#999">BRAND</text></svg>
+                                <span>Upload brand/series logo</span>
+                            </div>
+                            <img id="brandLogoPreview" class="upload-preview" style="display:none">
+                        </div>
+                        <div class="photo-controls" id="brandLogoControls" style="display:none">
+                            <label>Logo Size</label>
+                            <input type="range" id="brandLogoSize" min="20" max="100" step="1" value="50">
+                            <button class="btn-secondary" id="removeBrandLogo">Remove Logo</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Tab -->
+                <div class="tab-content" id="tab-stats">
+                    <div class="stats-type-toggle">
+                        <button class="stat-toggle-btn active" data-type="batting">Batting Stats</button>
+                        <button class="stat-toggle-btn" data-type="pitching">Pitching Stats</button>
+                    </div>
+
+                    <div id="battingStats">
+                        <h3 class="stats-header">Batting Statistics</h3>
+                        <div class="stats-year-row">
+                            <div class="form-group">
+                                <label>Stats Year</label>
+                                <input type="text" id="statsYear" placeholder="2026" maxlength="4">
+                            </div>
+                            <div class="form-group">
+                                <label>League</label>
+                                <input type="text" id="league" placeholder="Little League" maxlength="20">
+                            </div>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-input">
+                                <label>G</label>
+                                <input type="text" id="stat_G" placeholder="0" maxlength="4">
+                                <span class="stat-label-full">Games</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>AB</label>
+                                <input type="text" id="stat_AB" placeholder="0" maxlength="4">
+                                <span class="stat-label-full">At Bats</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>R</label>
+                                <input type="text" id="stat_R" placeholder="0" maxlength="4">
+                                <span class="stat-label-full">Runs</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>H</label>
+                                <input type="text" id="stat_H" placeholder="0" maxlength="4">
+                                <span class="stat-label-full">Hits</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>2B</label>
+                                <input type="text" id="stat_2B" placeholder="0" maxlength="4">
+                                <span class="stat-label-full">Doubles</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>3B</label>
+                                <input type="text" id="stat_3B" placeholder="0" maxlength="4">
+                                <span class="stat-label-full">Triples</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>HR</label>
+                                <input type="text" id="stat_HR" placeholder="0" maxlength="4">
+                                <span class="stat-label-full">Home Runs</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>RBI</label>
+                                <input type="text" id="stat_RBI" placeholder="0" maxlength="4">
+                                <span class="stat-label-full">Runs Batted In</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>BB</label>
+                                <input type="text" id="stat_BB" placeholder="0" maxlength="4">
+                                <span class="stat-label-full">Walks</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>SO</label>
+                                <input type="text" id="stat_SO" placeholder="0" maxlength="4">
+                                <span class="stat-label-full">Strikeouts</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>SB</label>
+                                <input type="text" id="stat_SB" placeholder="0" maxlength="4">
+                                <span class="stat-label-full">Stolen Bases</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>AVG</label>
+                                <input type="text" id="stat_AVG" placeholder=".000" maxlength="5">
+                                <span class="stat-label-full">Batting Avg</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>OBP</label>
+                                <input type="text" id="stat_OBP" placeholder=".000" maxlength="5">
+                                <span class="stat-label-full">On-Base %</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>SLG</label>
+                                <input type="text" id="stat_SLG" placeholder=".000" maxlength="5">
+                                <span class="stat-label-full">Slugging %</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>OPS</label>
+                                <input type="text" id="stat_OPS" placeholder=".000" maxlength="5">
+                                <span class="stat-label-full">OPS</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="pitchingStats" style="display:none">
+                        <h3 class="stats-header">Pitching Statistics</h3>
+                        <div class="stats-grid">
+                            <div class="stat-input">
+                                <label>W</label>
+                                <input type="text" id="stat_W" placeholder="0" maxlength="3">
+                                <span class="stat-label-full">Wins</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>L</label>
+                                <input type="text" id="stat_L" placeholder="0" maxlength="3">
+                                <span class="stat-label-full">Losses</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>ERA</label>
+                                <input type="text" id="stat_ERA" placeholder="0.00" maxlength="5">
+                                <span class="stat-label-full">Earned Run Avg</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>GP</label>
+                                <input type="text" id="stat_GP" placeholder="0" maxlength="3">
+                                <span class="stat-label-full">Games Pitched</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>GS</label>
+                                <input type="text" id="stat_GS" placeholder="0" maxlength="3">
+                                <span class="stat-label-full">Games Started</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>SV</label>
+                                <input type="text" id="stat_SV" placeholder="0" maxlength="3">
+                                <span class="stat-label-full">Saves</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>IP</label>
+                                <input type="text" id="stat_IP" placeholder="0.0" maxlength="5">
+                                <span class="stat-label-full">Innings Pitched</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>H</label>
+                                <input type="text" id="stat_HA" placeholder="0" maxlength="4">
+                                <span class="stat-label-full">Hits Allowed</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>ER</label>
+                                <input type="text" id="stat_ER" placeholder="0" maxlength="4">
+                                <span class="stat-label-full">Earned Runs</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>BB</label>
+                                <input type="text" id="stat_PBB" placeholder="0" maxlength="4">
+                                <span class="stat-label-full">Walks</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>K</label>
+                                <input type="text" id="stat_K" placeholder="0" maxlength="4">
+                                <span class="stat-label-full">Strikeouts</span>
+                            </div>
+                            <div class="stat-input">
+                                <label>WHIP</label>
+                                <input type="text" id="stat_WHIP" placeholder="0.00" maxlength="5">
+                                <span class="stat-label-full">WHIP</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Design Tab -->
+                <div class="tab-content" id="tab-design">
+                    <div class="form-group">
+                        <label>Card Style</label>
+                        <select id="cardStyle">
+                            <option value="classic">Classic (Topps Style)</option>
+                            <option value="modern">Modern (Chrome Style)</option>
+                            <option value="vintage">Vintage (Retro)</option>
+                            <option value="elite">Elite (Gold Foil)</option>
+                            <option value="rookie">Rookie Card Special</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Primary Color</label>
+                        <div class="color-picker-row">
+                            <input type="color" id="primaryColor" value="#c8102e">
+                            <span class="color-label" id="primaryColorLabel">#C8102E</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Secondary Color</label>
+                        <div class="color-picker-row">
+                            <input type="color" id="secondaryColor" value="#003087">
+                            <span class="color-label" id="secondaryColorLabel">#003087</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Accent Color</label>
+                        <div class="color-picker-row">
+                            <input type="color" id="accentColor" value="#FFD700">
+                            <span class="color-label" id="accentColorLabel">#FFD700</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Name Text Color</label>
+                        <div class="color-picker-row">
+                            <input type="color" id="nameColor" value="#ffffff">
+                            <span class="color-label" id="nameColorLabel">#FFFFFF</span>
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">Quick Team Colors</h3>
+                    <div class="team-presets">
+                        <button class="team-preset" data-primary="#c8102e" data-secondary="#003087" data-accent="#FFD700" title="Angels">LAA</button>
+                        <button class="team-preset" data-primary="#003831" data-secondary="#EFB21E" data-accent="#ffffff" title="Athletics">OAK</button>
+                        <button class="team-preset" data-primary="#BD3039" data-secondary="#0C2340" data-accent="#ffffff" title="Red Sox">BOS</button>
+                        <button class="team-preset" data-primary="#0E3386" data-secondary="#005A9C" data-accent="#EF3E42" title="Dodgers">LAD</button>
+                        <button class="team-preset" data-primary="#002D72" data-secondary="#FF5910" data-accent="#ffffff" title="Mets">NYM</button>
+                        <button class="team-preset" data-primary="#003087" data-secondary="#132448" data-accent="#C4CED4" title="Yankees">NYY</button>
+                        <button class="team-preset" data-primary="#C41E3A" data-secondary="#0C2340" data-accent="#FEDB00" title="Cardinals">STL</button>
+                        <button class="team-preset" data-primary="#0E3386" data-secondary="#A71930" data-accent="#E3D4AD" title="Braves">ATL</button>
+                        <button class="team-preset" data-primary="#0C2340" data-secondary="#E31937" data-accent="#FFB81C" title="Astros">HOU</button>
+                        <button class="team-preset" data-primary="#27251F" data-secondary="#FD5A1E" data-accent="#EFD19F" title="Giants">SF</button>
+                        <button class="team-preset" data-primary="#0C2C56" data-secondary="#005C5C" data-accent="#C4CED4" title="Mariners">SEA</button>
+                        <button class="team-preset" data-primary="#E81828" data-secondary="#002B5C" data-accent="#ffffff" title="Cubs">CHC</button>
+                    </div>
+
+                    <h3 class="section-title">Card Effects</h3>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="showGloss" checked>
+                        <label for="showGloss">Glossy shine effect</label>
+                    </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="showFoil">
+                        <label for="showFoil">Foil / holographic effect</label>
+                    </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="showRookieBadge">
+                        <label for="showRookieBadge">Rookie card badge</label>
+                    </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="showAllStar">
+                        <label for="showAllStar">All-Star badge</label>
+                    </div>
+                    <div class="form-group">
+                        <label>Border Thickness</label>
+                        <input type="range" id="borderThickness" min="4" max="20" step="1" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label>Photo Vignette</label>
+                        <input type="range" id="vignetteStrength" min="0" max="100" step="5" value="30">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="preview-panel">
+                <div class="preview-controls">
+                    <button class="preview-btn active" id="showFront">Front</button>
+                    <button class="preview-btn" id="showBack">Back</button>
+                    <button class="preview-btn print-btn" id="printCard">Print Card</button>
+                    <button class="preview-btn save-btn" id="saveCard">Save as Image</button>
+                </div>
+
+                <div class="card-preview-area">
+                    <!-- FRONT OF CARD -->
+                    <div class="card-container" id="cardFront">
+                        <div class="card baseball-card front" id="cardFrontInner">
+                            <!-- Dynamic background -->
+                            <div class="card-bg-layer" id="cardBgLayer"></div>
+                            <div class="card-foil-layer" id="cardFoilLayer"></div>
+
+                            <!-- Top bar with brand/year -->
+                            <div class="card-top-bar" id="cardTopBar">
+                                <img id="brandLogoDisplay" class="brand-logo-display" style="display:none">
+                                <span class="card-series" id="cardSeriesDisplay"></span>
+                                <span class="card-year-display" id="cardYearDisplay"></span>
+                            </div>
+
+                            <!-- Player photo area -->
+                            <div class="card-photo-area" id="cardPhotoArea">
+                                <div class="field-bg" id="fieldBg">
+                                    <canvas id="fieldCanvas" width="600" height="500"></canvas>
+                                </div>
+                                <div class="player-photo-container" id="playerPhotoContainer">
+                                    <img id="playerPhotoDisplay" class="player-photo-display">
+                                    <div class="photo-placeholder-card" id="photoPlaceholderCard">
+                                        <svg viewBox="0 0 120 160" width="120" height="160">
+                                            <ellipse cx="60" cy="50" rx="35" ry="40" fill="#ccc"/>
+                                            <ellipse cx="60" cy="150" rx="55" ry="60" fill="#ccc"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="photo-vignette" id="photoVignette"></div>
+                            </div>
+
+                            <!-- Team logo on card -->
+                            <div class="card-team-logo" id="cardTeamLogo">
+                                <img id="teamLogoDisplay" class="team-logo-display" style="display:none">
+                            </div>
+
+                            <!-- Position badge -->
+                            <div class="position-badge" id="positionBadge">CF</div>
+
+                            <!-- Name plate -->
+                            <div class="card-nameplate" id="cardNameplate">
+                                <div class="player-name-display" id="playerNameDisplay">PLAYER NAME</div>
+                                <div class="team-name-display" id="teamNameDisplay">TEAM NAME</div>
+                            </div>
+
+                            <!-- Rookie badge -->
+                            <div class="rookie-badge" id="rookieBadge" style="display:none">
+                                <span>RC</span>
+                                ROOKIE CARD
+                            </div>
+
+                            <!-- All-Star badge -->
+                            <div class="allstar-badge" id="allstarBadge" style="display:none">
+                                &#9733; ALL-STAR
+                            </div>
+
+                            <!-- Glossy overlay -->
+                            <div class="card-gloss" id="cardGloss"></div>
+
+                            <!-- Card number -->
+                            <div class="card-number-front" id="cardNumberFront"></div>
+                        </div>
+                    </div>
+
+                    <!-- BACK OF CARD -->
+                    <div class="card-container" id="cardBack" style="display:none">
+                        <div class="card baseball-card back" id="cardBackInner">
+                            <div class="card-back-bg" id="cardBackBg"></div>
+
+                            <!-- Header -->
+                            <div class="back-header" id="backHeader">
+                                <div class="back-number" id="backNumber">#00</div>
+                                <div class="back-name" id="backName">PLAYER NAME</div>
+                                <div class="back-team" id="backTeam">TEAM NAME</div>
+                            </div>
+
+                            <!-- Player info box -->
+                            <div class="back-info-box" id="backInfoBox">
+                                <div class="info-row">
+                                    <span class="info-label">Position</span>
+                                    <span class="info-value" id="backPosition">CF</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Bats/Throws</span>
+                                    <span class="info-value" id="backBatThrow">R/R</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Height/Weight</span>
+                                    <span class="info-value" id="backHtWt">-</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Born</span>
+                                    <span class="info-value" id="backBorn">-</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Hometown</span>
+                                    <span class="info-value" id="backHometown">-</span>
+                                </div>
+                            </div>
+
+                            <!-- Stats table -->
+                            <div class="back-stats-table" id="backStatsTable">
+                                <!-- Filled dynamically -->
+                            </div>
+
+                            <!-- Bio -->
+                            <div class="back-bio" id="backBio">
+                                <p id="backBioText"></p>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="back-footer" id="backFooter">
+                                <span class="back-card-number" id="backCardNumber"></span>
+                                <span class="back-copyright">&copy; <span id="backYear">2026</span> Baseball Card Maker Pro</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print template (hidden) -->
+    <div id="printArea" class="print-area">
+        <div id="printFront" class="print-card"></div>
+        <div id="printBack" class="print-card"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
