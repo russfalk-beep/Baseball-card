@@ -395,12 +395,12 @@ input[type="range"] {
 .card-container {
     width: var(--card-width);
     height: var(--card-height);
-    filter: drop-shadow(0 8px 32px rgba(0,0,0,0.5));
+    filter: drop-shadow(0 4px 16px rgba(0,0,0,0.4)) drop-shadow(0 12px 40px rgba(0,0,0,0.3));
 }
 .baseball-card {
     width: 100%;
     height: 100%;
-    border-radius: 12px;
+    border-radius: 10px;
     position: relative;
     overflow: hidden;
     background: #222;
@@ -417,7 +417,49 @@ input[type="range"] {
     position: absolute;
     inset: 0;
     z-index: 0;
-    border-radius: 12px;
+    border-radius: 10px;
+}
+
+/* Cardstock texture overlay */
+.card-texture {
+    position: absolute;
+    inset: 0;
+    z-index: 18;
+    pointer-events: none;
+    border-radius: 10px;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 128px 128px;
+    mix-blend-mode: overlay;
+}
+
+/* Inner photo border - like real Topps cards */
+.card-photo-border {
+    position: absolute;
+    top: 36px;
+    left: 10px;
+    right: 10px;
+    bottom: 64px;
+    z-index: 3;
+    border: 2px solid rgba(255,255,255,0.25);
+    border-radius: 4px;
+    pointer-events: none;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
+}
+
+/* Embossed card edge */
+.card-edge {
+    position: absolute;
+    inset: 0;
+    z-index: 19;
+    pointer-events: none;
+    border-radius: 10px;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.15),
+        inset 0 -1px 0 rgba(0,0,0,0.3),
+        inset 1px 0 0 rgba(255,255,255,0.08),
+        inset -1px 0 0 rgba(0,0,0,0.15),
+        0 1px 3px rgba(0,0,0,0.3);
 }
 
 /* Foil effect */
@@ -427,7 +469,7 @@ input[type="range"] {
     z-index: 15;
     pointer-events: none;
     opacity: 0;
-    border-radius: 12px;
+    border-radius: 10px;
     background: linear-gradient(
         135deg,
         transparent 0%,
@@ -442,6 +484,18 @@ input[type="range"] {
     transition: opacity 0.3s;
 }
 
+/* Rainbow shimmer for foil */
+.card-rainbow-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 16;
+    pointer-events: none;
+    opacity: 0;
+    border-radius: 10px;
+    mix-blend-mode: color-dodge;
+    transition: opacity 0.3s;
+}
+
 /* Top bar */
 .card-top-bar {
     position: relative;
@@ -449,27 +503,30 @@ input[type="range"] {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 12px;
-    min-height: 36px;
+    padding: 6px 12px;
+    min-height: 32px;
 }
 .brand-logo-display {
-    height: 24px;
+    height: 22px;
     width: auto;
     max-width: 60px;
     object-fit: contain;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.5));
 }
 .card-series {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     letter-spacing: 2px;
     text-transform: uppercase;
-    opacity: 0.8;
+    opacity: 0.7;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 .card-year-display {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     letter-spacing: 1px;
     font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 /* Photo area */
@@ -520,10 +577,21 @@ input[type="range"] {
     border-radius: 0;
 }
 
+/* Bottom fade from photo to nameplate */
+.card-photo-fade {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    z-index: 4;
+    pointer-events: none;
+}
+
 /* Team logo */
 .card-team-logo {
     position: absolute;
-    top: 42px;
+    top: 38px;
     right: 10px;
     z-index: 10;
     width: 55px;
@@ -531,38 +599,55 @@ input[type="range"] {
     display: flex;
     align-items: center;
     justify-content: center;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
 }
 .team-logo-display {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
 }
 
 /* Position badge */
 .position-badge {
     position: absolute;
-    top: 42px;
+    top: 38px;
     left: 10px;
     z-index: 10;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.75);
     color: white;
     font-family: 'Oswald', sans-serif;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 4px;
+    padding: 3px 8px;
+    border-radius: 3px;
     letter-spacing: 1px;
     border: 2px solid rgba(255,255,255,0.3);
+    backdrop-filter: blur(4px);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+/* Jersey number floating */
+.jersey-number-display {
+    position: absolute;
+    top: 70px;
+    left: 10px;
+    z-index: 10;
+    font-family: 'Anton', sans-serif;
+    font-size: 1.8rem;
+    color: white;
+    opacity: 0.2;
+    letter-spacing: -1px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    line-height: 1;
 }
 
 /* Name plate */
 .card-nameplate {
     position: relative;
     z-index: 10;
-    padding: 10px 14px 12px;
-    text-align: center;
-    min-height: 60px;
+    padding: 8px 14px 10px;
+    text-align: left;
+    min-height: 56px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -573,63 +658,75 @@ input[type="range"] {
     letter-spacing: 2px;
     text-transform: uppercase;
     color: white;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.7), 0 0 10px rgba(0,0,0,0.3);
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.8), 0 0 10px rgba(0,0,0,0.3);
     line-height: 1.1;
+    -webkit-text-stroke: 0.5px rgba(0,0,0,0.3);
 }
 .team-name-display {
     font-family: 'Oswald', sans-serif;
-    font-size: 0.8rem;
-    letter-spacing: 3px;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
     text-transform: uppercase;
-    opacity: 0.9;
-    margin-top: 2px;
+    opacity: 0.85;
+    margin-top: 1px;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Nameplate decorative line */
+.nameplate-accent {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    z-index: 11;
 }
 
 /* Rookie badge */
 .rookie-badge {
     position: absolute;
-    bottom: 70px;
+    bottom: 66px;
     left: 10px;
     z-index: 12;
-    background: linear-gradient(135deg, #FFD700, #FFA500);
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%);
     color: #000;
     font-family: 'Oswald', sans-serif;
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     font-weight: 700;
     padding: 3px 8px;
-    border-radius: 4px;
+    border-radius: 3px;
     letter-spacing: 1px;
     text-transform: uppercase;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
     display: flex;
     align-items: center;
     gap: 4px;
+    border: 1px solid rgba(139,90,43,0.5);
 }
 .rookie-badge span {
     background: #c8102e;
     color: white;
     padding: 1px 4px;
     border-radius: 2px;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
 }
 
 /* All-Star badge */
 .allstar-badge {
     position: absolute;
-    bottom: 70px;
+    bottom: 66px;
     right: 10px;
     z-index: 12;
-    background: linear-gradient(135deg, #1a237e, #283593);
+    background: linear-gradient(135deg, #0d1b4a 0%, #1b3a8a 50%, #0d1b4a 100%);
     color: #FFD700;
     font-family: 'Oswald', sans-serif;
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     font-weight: 700;
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 3px 8px;
+    border-radius: 3px;
     letter-spacing: 1px;
     text-transform: uppercase;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15);
     border: 1px solid rgba(255,215,0,0.4);
 }
 
@@ -639,12 +736,12 @@ input[type="range"] {
     inset: 0;
     z-index: 20;
     pointer-events: none;
-    border-radius: 12px;
+    border-radius: 10px;
     background: linear-gradient(
         135deg,
-        rgba(255,255,255,0.25) 0%,
-        rgba(255,255,255,0.08) 30%,
-        transparent 50%,
+        rgba(255,255,255,0.22) 0%,
+        rgba(255,255,255,0.06) 25%,
+        transparent 45%,
         transparent 100%
     );
 }
@@ -652,12 +749,12 @@ input[type="range"] {
 /* Card number front */
 .card-number-front {
     position: absolute;
-    bottom: 5px;
+    bottom: 4px;
     right: 10px;
     z-index: 10;
     font-family: 'Roboto Condensed', sans-serif;
-    font-size: 0.6rem;
-    opacity: 0.5;
+    font-size: 0.55rem;
+    opacity: 0.4;
     letter-spacing: 1px;
 }
 
@@ -670,97 +767,149 @@ input[type="range"] {
 .card-back-bg {
     position: absolute;
     inset: 0;
-    border-radius: 12px;
+    border-radius: 10px;
     z-index: 0;
 }
+
+/* Cardstock texture on back */
+.card-back-texture {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: 10px;
+    opacity: 0.06;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 128px 128px;
+    mix-blend-mode: overlay;
+}
+
+/* Edge on back */
+.card-back-edge {
+    position: absolute;
+    inset: 0;
+    z-index: 15;
+    pointer-events: none;
+    border-radius: 10px;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.1),
+        inset 0 -1px 0 rgba(0,0,0,0.3),
+        inset 1px 0 0 rgba(255,255,255,0.05),
+        inset -1px 0 0 rgba(0,0,0,0.15);
+}
+
+/* Back small player headshot */
+.back-headshot-area {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    z-index: 3;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(255,255,255,0.3);
+    background: rgba(0,0,0,0.3);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+.back-headshot-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 .back-header {
     position: relative;
     z-index: 2;
-    text-align: center;
-    padding: 14px 12px 10px;
+    text-align: left;
+    padding: 12px 70px 10px 14px;
     border-bottom: 2px solid rgba(255,255,255,0.15);
 }
 .back-number {
     font-family: 'Anton', sans-serif;
-    font-size: 1.1rem;
-    opacity: 0.7;
+    font-size: 0.85rem;
+    opacity: 0.6;
     letter-spacing: 2px;
 }
 .back-name {
     font-family: 'Anton', sans-serif;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: white;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    line-height: 1.1;
 }
 .back-team {
     font-family: 'Oswald', sans-serif;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     letter-spacing: 3px;
     text-transform: uppercase;
-    opacity: 0.8;
+    opacity: 0.7;
+    margin-top: 2px;
 }
 
 /* Info box */
 .back-info-box {
     position: relative;
     z-index: 2;
-    margin: 10px 14px;
+    margin: 8px 12px;
     background: rgba(0,0,0,0.25);
-    border-radius: 8px;
-    padding: 8px 12px;
+    border-radius: 6px;
+    padding: 6px 10px;
+    border: 1px solid rgba(255,255,255,0.06);
 }
 .info-row {
     display: flex;
     justify-content: space-between;
-    padding: 3px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    font-size: 0.75rem;
+    padding: 2px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 0.7rem;
 }
 .info-row:last-child { border-bottom: none; }
 .info-label {
-    color: rgba(255,255,255,0.6);
+    color: rgba(255,255,255,0.5);
     font-weight: 700;
     text-transform: uppercase;
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     letter-spacing: 0.5px;
 }
 .info-value {
     font-weight: 700;
     color: white;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
 }
 
 /* Stats table */
 .back-stats-table {
     position: relative;
     z-index: 2;
-    margin: 8px 14px;
+    margin: 6px 12px;
     flex: 1;
 }
 .stats-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
 }
 .stats-table th {
-    background: rgba(0,0,0,0.4);
-    color: rgba(255,255,255,0.8);
-    padding: 5px 4px;
+    background: rgba(0,0,0,0.5);
+    color: rgba(255,255,255,0.75);
+    padding: 4px 3px;
     font-weight: 700;
     text-transform: uppercase;
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     letter-spacing: 0.5px;
     border-bottom: 2px solid rgba(255,255,255,0.2);
 }
 .stats-table td {
-    padding: 5px 4px;
+    padding: 4px 3px;
     text-align: center;
     font-weight: 700;
     color: white;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
     font-family: 'Roboto Condensed', sans-serif;
+    font-size: 0.7rem;
 }
 .stats-table tr:nth-child(even) td {
     background: rgba(255,255,255,0.03);
@@ -770,17 +919,26 @@ input[type="range"] {
 .back-bio {
     position: relative;
     z-index: 2;
-    margin: 6px 14px;
-    padding: 8px 10px;
+    margin: 4px 12px;
+    padding: 6px 10px;
     background: rgba(0,0,0,0.2);
-    border-radius: 6px;
+    border-radius: 5px;
     border-left: 3px solid rgba(255,215,0,0.5);
 }
 .back-bio p {
-    font-size: 0.7rem;
-    line-height: 1.4;
-    color: rgba(255,255,255,0.85);
+    font-size: 0.65rem;
+    line-height: 1.35;
+    color: rgba(255,255,255,0.8);
     font-style: italic;
+}
+
+/* Back baseball icon watermark */
+.back-watermark {
+    position: absolute;
+    bottom: 30px;
+    right: 10px;
+    z-index: 1;
+    opacity: 0.04;
 }
 
 /* Footer */
@@ -789,15 +947,28 @@ input[type="range"] {
     z-index: 2;
     display: flex;
     justify-content: space-between;
-    padding: 8px 14px;
-    font-size: 0.55rem;
-    color: rgba(255,255,255,0.4);
-    border-top: 1px solid rgba(255,255,255,0.1);
+    align-items: center;
+    padding: 6px 12px;
+    font-size: 0.5rem;
+    color: rgba(255,255,255,0.35);
+    border-top: 1px solid rgba(255,255,255,0.08);
     margin-top: auto;
 }
 .back-card-number {
     font-weight: 700;
     letter-spacing: 1px;
+}
+.back-copyright {
+    font-size: 0.45rem;
+    letter-spacing: 0.5px;
+}
+
+/* Back decorative line */
+.back-accent-line {
+    position: relative;
+    z-index: 2;
+    height: 2px;
+    margin: 0 12px;
 }
 
 /* ===== PRINT STYLES ===== */
@@ -880,10 +1051,10 @@ input[type="range"] {
 .tab-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 .tab-content::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-/* ===== CARD STYLE VARIANTS ===== */
-.card-style-classic .card-bg-layer {
-    border: 10px solid;
-    border-image: linear-gradient(180deg, var(--card-primary, #c8102e), var(--card-secondary, #003087)) 1;
+/* ===== CARD 3D TILT ===== */
+.card-container {
+    transition: transform 0.1s ease-out;
+    transform-style: preserve-3d;
 }
 
 /* Loading animation for images */

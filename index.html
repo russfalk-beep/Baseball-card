@@ -437,6 +437,10 @@
                         <input type="checkbox" id="showAllStar">
                         <label for="showAllStar">All-Star badge</label>
                     </div>
+                    <div class="checkbox-row">
+                        <input type="checkbox" id="show3DTilt" checked>
+                        <label for="show3DTilt">3D tilt on hover</label>
+                    </div>
                     <div class="form-group">
                         <label>Border Thickness</label>
                         <input type="range" id="borderThickness" min="4" max="20" step="1" value="10">
@@ -464,6 +468,12 @@
                             <!-- Dynamic background -->
                             <div class="card-bg-layer" id="cardBgLayer"></div>
                             <div class="card-foil-layer" id="cardFoilLayer"></div>
+                            <div class="card-rainbow-layer" id="cardRainbowLayer"></div>
+                            <div class="card-texture"></div>
+                            <div class="card-edge"></div>
+
+                            <!-- Inner photo border -->
+                            <div class="card-photo-border" id="cardPhotoBorder"></div>
 
                             <!-- Top bar with brand/year -->
                             <div class="card-top-bar" id="cardTopBar">
@@ -487,6 +497,7 @@
                                     </div>
                                 </div>
                                 <div class="photo-vignette" id="photoVignette"></div>
+                                <div class="card-photo-fade" id="cardPhotoFade"></div>
                             </div>
 
                             <!-- Team logo on card -->
@@ -497,10 +508,14 @@
                             <!-- Position badge -->
                             <div class="position-badge" id="positionBadge">CF</div>
 
+                            <!-- Jersey number watermark -->
+                            <div class="jersey-number-display" id="jerseyNumberDisplay"></div>
+
                             <!-- Name plate -->
                             <div class="card-nameplate" id="cardNameplate">
                                 <div class="player-name-display" id="playerNameDisplay">PLAYER NAME</div>
                                 <div class="team-name-display" id="teamNameDisplay">TEAM NAME</div>
+                                <div class="nameplate-accent" id="nameplateAccent"></div>
                             </div>
 
                             <!-- Rookie badge -->
@@ -526,6 +541,13 @@
                     <div class="card-container" id="cardBack" style="display:none">
                         <div class="card baseball-card back" id="cardBackInner">
                             <div class="card-back-bg" id="cardBackBg"></div>
+                            <div class="card-back-texture"></div>
+                            <div class="card-back-edge"></div>
+
+                            <!-- Small headshot -->
+                            <div class="back-headshot-area" id="backHeadshotArea">
+                                <img id="backHeadshot" style="display:none">
+                            </div>
 
                             <!-- Header -->
                             <div class="back-header" id="backHeader">
@@ -533,6 +555,9 @@
                                 <div class="back-name" id="backName">PLAYER NAME</div>
                                 <div class="back-team" id="backTeam">TEAM NAME</div>
                             </div>
+
+                            <!-- Accent line -->
+                            <div class="back-accent-line" id="backAccentLine"></div>
 
                             <!-- Player info box -->
                             <div class="back-info-box" id="backInfoBox">
@@ -566,6 +591,15 @@
                             <!-- Bio -->
                             <div class="back-bio" id="backBio">
                                 <p id="backBioText"></p>
+                            </div>
+
+                            <!-- Baseball watermark -->
+                            <div class="back-watermark">
+                                <svg viewBox="0 0 80 80" width="60" height="60">
+                                    <circle cx="40" cy="40" r="36" fill="none" stroke="white" stroke-width="1.5"/>
+                                    <path d="M40 4 C30 17, 25 27, 40 40 C55 27, 50 17, 40 4" fill="none" stroke="white" stroke-width="1"/>
+                                    <path d="M40 76 C30 63, 25 53, 40 40 C55 53, 50 63, 40 76" fill="none" stroke="white" stroke-width="1"/>
+                                </svg>
                             </div>
 
                             <!-- Footer -->
