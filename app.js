@@ -475,47 +475,135 @@
         return h;
     }
 
-    // ===== PRINT & SAVE =====
+    // ===== PRINT MODAL & PRINT =====
     function setupPrint() {
-        $('#printCard').addEventListener('click', () => {
-            $('#printFront').innerHTML = '';
-            $('#printBack').innerHTML = '';
-            $('#printFront').appendChild($('#cardFrontInner').cloneNode(true));
-            $('#printBack').appendChild($('#cardBackInner').cloneNode(true));
-            window.print();
+        const overlay = $('#printModalOverlay');
+        const closeModal = () => overlay.classList.remove('open');
+        const openModal = () => overlay.classList.add('open');
+
+        $('#printCard').addEventListener('click', openModal);
+        $('#printModalClose').addEventListener('click', closeModal);
+        $('#printCancel').addEventListener('click', closeModal);
+        overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+
+        $('#printGo').addEventListener('click', () => {
+            const layout = document.querySelector('input[name="printLayout"]:checked').value;
+            const count = parseInt(layout);
+            const doubleSided = $('#printDoubleSided').checked;
+            const showCropMarks = $('#printCutLines').checked;
+
+            buildPrintPages(count, doubleSided, showCropMarks);
+            closeModal();
+            // Small delay so modal closes before print dialog
+            setTimeout(() => window.print(), 150);
         });
-        $('#saveCard').addEventListener('click', async () => {
-            try {
-                const front = await htmlToImage($('#cardFrontInner'), 350, 490);
-                const back = await htmlToImage($('#cardBackInner'), 350, 490);
-                const canvas = document.createElement('canvas');
-                const s = 3;
-                canvas.width = 350 * s; canvas.height = (490 * 2 + 40) * s;
-                const ctx = canvas.getContext('2d');
-                ctx.scale(s, s);
-                ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 350, 490 * 2 + 40);
-                ctx.drawImage(front, 0, 0, 350, 490);
-                ctx.fillStyle = '#333'; ctx.font = '10px Arial'; ctx.textAlign = 'center';
-                ctx.fillText('- - - CUT HERE - - - FOLD LINE - - -', 175, 510);
-                ctx.drawImage(back, 0, 530, 350, 490);
-                const link = document.createElement('a');
-                link.download = `baseball-card-${$('#playerName').value || 'player'}.png`;
-                link.href = canvas.toDataURL('image/png'); link.click();
-            } catch (e) {
-                alert('Use the Print button and save as PDF for best results.');
-            }
+
+        // Save as image (keeps old approach but improved)
+        $('#saveCard').addEventListener('click', () => {
+            // Use print dialog with "Save as PDF" instruction
+            const doubleSided = true;
+            buildPrintPages(1, doubleSided, true);
+            setTimeout(() => {
+                window.print();
+            }, 150);
         });
     }
 
-    function htmlToImage(el, w, h) {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => resolve(img);
-            img.onerror = reject;
-            img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
-                `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml">${el.outerHTML}</div></foreignObject></svg>`
-            );
-        });
+    function buildPrintPages(cardCount, doubleSided, showCropMarks) {
+        const printArea = $('#printArea');
+        printArea.innerHTML = '';
+
+        const cropClass = showCropMarks ? '' : 'no-crop';
+
+        // Clone front and back card
+        const frontClone = () => {
+            const el = $('#cardFrontInner').cloneNode(true);
+            el.removeAttribute('id');
+            // Remove interactive effects for print
+            const gloss = el.querySelector('.card-gloss');
+            const foil = el.querySelector('.card-foil-layer');
+            const rainbow = el.querySelector('.card-rainbow-layer');
+            if (gloss) gloss.style.display = 'none';
+            if (foil) foil.style.opacity = '0';
+            if (rainbow) rainbow.style.opacity = '0';
+            return el;
+        };
+        const backClone = () => {
+            const el = $('#cardBackInner').cloneNode(true);
+            el.removeAttribute('id');
+            return el;
+        };
+
+        function makeCropMarks() {
+            return `
+                <div class="crop-mark top-left-h"></div>
+                <div class="crop-mark top-left-v"></div>
+                <div class="crop-mark top-right-h"></div>
+                <div class="crop-mark top-right-v"></div>
+                <div class="crop-mark bottom-left-h"></div>
+                <div class="crop-mark bottom-left-v"></div>
+                <div class="crop-mark bottom-right-h"></div>
+                <div class="crop-mark bottom-right-v"></div>
+            `;
+        }
+
+        function wrapCard(cardEl) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `print-card-wrapper ${cropClass}`;
+            wrapper.innerHTML = makeCropMarks();
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'print-card';
+            cardDiv.appendChild(cardEl);
+            wrapper.appendChild(cardDiv);
+            return wrapper;
+        }
+
+        // === PAGE 1: FRONTS ===
+        const frontPage = document.createElement('div');
+        frontPage.className = 'print-page';
+        const frontLabel = document.createElement('div');
+        frontLabel.className = 'print-page-label';
+        frontLabel.textContent = doubleSided ? 'FRONT SIDE' : 'FRONT';
+        frontPage.appendChild(frontLabel);
+
+        for (let i = 0; i < cardCount; i++) {
+            frontPage.appendChild(wrapCard(frontClone()));
+        }
+        printArea.appendChild(frontPage);
+
+        // === PAGE 2: BACKS (if double-sided) ===
+        if (doubleSided) {
+            const backPage = document.createElement('div');
+            backPage.className = 'print-page';
+            const backLabel = document.createElement('div');
+            backLabel.className = 'print-page-label';
+            backLabel.textContent = 'BACK SIDE';
+            backPage.appendChild(backLabel);
+
+            if (cardCount === 1) {
+                // Single card — just center the back
+                backPage.appendChild(wrapCard(backClone()));
+            } else {
+                // 4-card layout: mirror order for double-sided alignment
+                // When flipping on long edge, the rows stay the same but
+                // columns reverse. So for a 2x2 grid:
+                // Front: [1][2]  ->  Back: [2][1]
+                //        [3][4]             [4][3]
+                const backs = [];
+                for (let i = 0; i < cardCount; i++) {
+                    backs.push(wrapCard(backClone()));
+                }
+                // Swap columns: [0,1,2,3] -> [1,0,3,2]
+                const mirrored = [backs[1], backs[0], backs[3], backs[2]];
+                mirrored.forEach(b => backPage.appendChild(b));
+            }
+
+            const flipNote = document.createElement('div');
+            flipNote.className = 'print-flip-note';
+            flipNote.textContent = 'Feed this page back through your printer — select "Flip on Long Edge"';
+            backPage.appendChild(flipNote);
+            printArea.appendChild(backPage);
+        }
     }
 
     // ===== FOIL + GLOSS MOUSE EFFECTS =====

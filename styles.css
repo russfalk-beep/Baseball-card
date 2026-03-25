@@ -971,50 +971,371 @@ input[type="range"] {
     margin: 0 12px;
 }
 
-/* ===== PRINT STYLES ===== */
+/* ===== PRINT MODAL ===== */
+.print-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    justify-content: center;
+    align-items: center;
+}
+.print-modal-overlay.open {
+    display: flex;
+}
+.print-modal {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 520px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.print-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+}
+.print-modal-header h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.print-modal-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px 8px;
+}
+.print-modal-close:hover { color: var(--accent); }
+.print-modal-body {
+    padding: 20px;
+}
+.print-info {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+}
+.print-info strong { color: var(--accent); }
+
+/* Layout options */
+.print-layout-options {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.print-layout-option {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+.print-layout-option:has(input:checked) {
+    border-color: var(--accent);
+    background: rgba(233,69,96,0.1);
+}
+.print-layout-option input { display: none; }
+.print-layout-option span {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+.print-layout-desc {
+    font-size: 0.7rem !important;
+    font-weight: 400 !important;
+    color: var(--text-secondary) !important;
+}
+.print-layout-preview {
+    width: 80px;
+    height: 100px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: rgba(255,255,255,0.05);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px;
+}
+.mini-card {
+    background: var(--accent);
+    border-radius: 2px;
+    opacity: 0.6;
+}
+.layout-1 .mini-card { width: 30px; height: 42px; }
+.layout-4 .mini-card { width: 28px; height: 38px; }
+.layout-4 { gap: 3px; }
+
+/* Print options */
+.print-option-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.print-option-row label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+/* Instructions */
+.print-instructions {
+    margin: 16px 0;
+    padding: 12px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+}
+.print-instructions h4 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 8px;
+}
+.print-instructions ul {
+    list-style: none;
+    padding: 0;
+}
+.print-instructions li {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    padding: 3px 0;
+    padding-left: 14px;
+    position: relative;
+}
+.print-instructions li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    opacity: 0.6;
+}
+.print-instructions li strong { color: var(--text-primary); }
+
+/* Modal actions */
+.print-modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+.btn-print-go {
+    flex: 1;
+    padding: 12px;
+    background: #1b7a3d;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-print-go:hover { background: #23944a; }
+.btn-print-cancel {
+    padding: 12px 20px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-print-cancel:hover { border-color: var(--accent); color: var(--text-primary); }
+
+/* ===== PRINT AREA (hidden on screen) ===== */
 .print-area {
     display: none;
 }
 
+/* ===== PRINT STYLES ===== */
 @media print {
-    body * { visibility: hidden !important; }
-    .print-area,
-    .print-area * {
-        visibility: visible !important;
-    }
+    /* Hide everything on screen */
+    body > *:not(.print-area) { display: none !important; visibility: hidden !important; }
+    .print-modal-overlay { display: none !important; }
+
     .print-area {
-        display: flex !important;
-        gap: 20px;
-        position: fixed;
+        display: block !important;
+        visibility: visible !important;
+        position: absolute;
         top: 0;
         left: 0;
         width: 100%;
-        height: 100%;
         background: white !important;
-        padding: 0.25in;
-        justify-content: center;
-        align-items: flex-start;
-        flex-wrap: wrap;
     }
+    .print-area * {
+        visibility: visible !important;
+    }
+
+    /* Each page */
+    .print-page {
+        width: 8.5in;
+        height: 11in;
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        align-content: center;
+        justify-content: center;
+        gap: 0;
+        background: white;
+        page-break-after: always;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+        box-sizing: border-box;
+        padding: 0;
+    }
+    .print-page:last-child {
+        page-break-after: auto;
+    }
+
+    /* Page label (FRONT / BACK) */
+    .print-page-label {
+        position: absolute;
+        top: 0.15in;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 8pt;
+        color: #999;
+        font-family: Arial, sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+    }
+
+    /* Card wrapper with crop marks */
+    .print-card-wrapper {
+        width: 2.75in;
+        height: 3.75in;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* The actual card at real size */
     .print-card {
         width: 2.5in;
         height: 3.5in;
         overflow: hidden;
-        border-radius: 8px;
-        page-break-inside: avoid;
+        border-radius: 6px;
+        position: relative;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
         color-adjust: exact !important;
     }
     .print-card .baseball-card {
-        width: 100% !important;
-        height: 100% !important;
-        border-radius: 8px;
+        width: 2.5in !important;
+        height: 3.5in !important;
+        border-radius: 6px;
+        font-size: 6.5pt;
+    }
+    .print-card .card-container {
+        width: 2.5in !important;
+        height: 3.5in !important;
+        filter: none !important;
+        transform: none !important;
+    }
+
+    /* Scale inner elements for print size */
+    .print-card .player-name-display { font-size: 0.9rem !important; }
+    .print-card .team-name-display { font-size: 0.45rem !important; }
+    .print-card .position-badge { font-size: 0.5rem !important; padding: 2px 5px !important; }
+    .print-card .jersey-number-display { font-size: 1.1rem !important; }
+    .print-card .card-nameplate { padding: 5px 8px 6px !important; min-height: 36px !important; }
+    .print-card .card-top-bar { min-height: 22px !important; padding: 3px 8px !important; }
+    .print-card .card-series { font-size: 0.4rem !important; }
+    .print-card .card-year-display { font-size: 0.5rem !important; }
+    .print-card .brand-logo-display { height: 14px !important; }
+    .print-card .card-number-front { font-size: 0.35rem !important; }
+    .print-card .rookie-badge { font-size: 0.35rem !important; padding: 2px 5px !important; bottom: 42px !important; }
+    .print-card .allstar-badge { font-size: 0.35rem !important; padding: 2px 5px !important; bottom: 42px !important; }
+
+    /* Back card print scaling */
+    .print-card .back-header { padding: 7px 45px 6px 9px !important; }
+    .print-card .back-number { font-size: 0.55rem !important; }
+    .print-card .back-name { font-size: 0.75rem !important; }
+    .print-card .back-team { font-size: 0.4rem !important; }
+    .print-card .back-info-box { margin: 4px 8px !important; padding: 4px 6px !important; }
+    .print-card .info-row { font-size: 0.45rem !important; }
+    .print-card .info-label { font-size: 0.38rem !important; }
+    .print-card .info-value { font-size: 0.45rem !important; }
+    .print-card .back-stats-table { margin: 4px 8px !important; }
+    .print-card .stats-table { font-size: 0.42rem !important; }
+    .print-card .stats-table th { font-size: 0.35rem !important; padding: 2px 1px !important; }
+    .print-card .stats-table td { font-size: 0.42rem !important; padding: 2px 1px !important; }
+    .print-card .back-bio { margin: 3px 8px !important; padding: 4px 6px !important; }
+    .print-card .back-bio p { font-size: 0.4rem !important; }
+    .print-card .back-footer { padding: 3px 8px !important; font-size: 0.32rem !important; }
+    .print-card .back-copyright { font-size: 0.28rem !important; }
+    .print-card .back-headshot-area { width: 34px !important; height: 34px !important; top: 6px !important; right: 8px !important; }
+
+    /* Remove screen-only effects for clean print */
+    .print-card .card-gloss,
+    .print-card .card-foil-layer,
+    .print-card .card-rainbow-layer { display: none !important; }
+
+    /* Crop marks */
+    .crop-mark {
+        position: absolute;
+        background: #999;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    .crop-mark.top-left-h { top: 0; left: 0.125in; width: 0.1in; height: 0.5pt; }
+    .crop-mark.top-left-v { top: 0.125in; left: 0; width: 0.5pt; height: 0.1in; }
+    .crop-mark.top-right-h { top: 0; right: 0.125in; width: 0.1in; height: 0.5pt; }
+    .crop-mark.top-right-v { top: 0.125in; right: 0; width: 0.5pt; height: 0.1in; }
+    .crop-mark.bottom-left-h { bottom: 0; left: 0.125in; width: 0.1in; height: 0.5pt; }
+    .crop-mark.bottom-left-v { bottom: 0.125in; left: 0; width: 0.5pt; height: 0.1in; }
+    .crop-mark.bottom-right-h { bottom: 0; right: 0.125in; width: 0.1in; height: 0.5pt; }
+    .crop-mark.bottom-right-v { bottom: 0.125in; right: 0; width: 0.5pt; height: 0.1in; }
+
+    .no-crop .crop-mark { display: none !important; }
+
+    /* Flip instruction for page 2 */
+    .print-flip-note {
+        position: absolute;
+        bottom: 0.2in;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 7pt;
+        color: #bbb;
+        font-family: Arial, sans-serif;
+        white-space: nowrap;
     }
 
     @page {
         size: letter;
-        margin: 0.25in;
+        margin: 0.5in;
     }
 }
 
