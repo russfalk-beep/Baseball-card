@@ -614,10 +614,72 @@
         </div>
     </div>
 
-    <!-- Print template (hidden) -->
+    <!-- Print Modal -->
+    <div class="print-modal-overlay" id="printModalOverlay">
+        <div class="print-modal">
+            <div class="print-modal-header">
+                <h2>Print Baseball Cards</h2>
+                <button class="print-modal-close" id="printModalClose">&times;</button>
+            </div>
+            <div class="print-modal-body">
+                <p class="print-info">Cards print at real size: <strong>2.5" &times; 3.5"</strong></p>
+
+                <div class="print-layout-options">
+                    <label class="print-layout-option">
+                        <input type="radio" name="printLayout" value="1" checked>
+                        <div class="print-layout-preview layout-1">
+                            <div class="mini-card"></div>
+                        </div>
+                        <span>1 Card</span>
+                        <span class="print-layout-desc">Single card, centered</span>
+                    </label>
+                    <label class="print-layout-option">
+                        <input type="radio" name="printLayout" value="4">
+                        <div class="print-layout-preview layout-4">
+                            <div class="mini-card"></div>
+                            <div class="mini-card"></div>
+                            <div class="mini-card"></div>
+                            <div class="mini-card"></div>
+                        </div>
+                        <span>4 Cards</span>
+                        <span class="print-layout-desc">2&times;2 grid, same card</span>
+                    </label>
+                </div>
+
+                <div class="print-option-row">
+                    <input type="checkbox" id="printDoubleSided" checked>
+                    <label for="printDoubleSided">
+                        Double-sided (fronts on page 1, backs on page 2)
+                    </label>
+                </div>
+
+                <div class="print-option-row">
+                    <input type="checkbox" id="printCutLines" checked>
+                    <label for="printCutLines">Show cut lines &amp; crop marks</label>
+                </div>
+
+                <div class="print-instructions">
+                    <h4>Printing Tips</h4>
+                    <ul>
+                        <li>Use <strong>cardstock paper</strong> (110 lb / 200 gsm) for best results</li>
+                        <li>Set your printer to <strong>"Actual Size"</strong> (not "Fit to Page")</li>
+                        <li>For double-sided: select <strong>"Flip on Long Edge"</strong> in printer settings</li>
+                        <li>Enable <strong>"Print Background Colors and Images"</strong> in your browser</li>
+                        <li>Cut along the crop marks with a paper cutter for clean edges</li>
+                    </ul>
+                </div>
+
+                <div class="print-modal-actions">
+                    <button class="btn-print-go" id="printGo">Print Cards</button>
+                    <button class="btn-print-cancel" id="printCancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print template (hidden, rendered at print time) -->
     <div id="printArea" class="print-area">
-        <div id="printFront" class="print-card"></div>
-        <div id="printBack" class="print-card"></div>
+        <!-- Pages inserted dynamically -->
     </div>
 
     <script src="app.js"></script>
