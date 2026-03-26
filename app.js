@@ -13,6 +13,8 @@
         setupControls();
         setupPrint();
         setup3DTilt();
+        setupFieldFormatting();
+        setupAutoCalcStats();
         drawFieldBackground();
         updateCard();
     });
@@ -111,6 +113,119 @@
             $('#accentColorLabel').textContent = btn.dataset.accent.toUpperCase();
             updateCard();
         }));
+    }
+
+    // ===== SMART FIELD FORMATTING =====
+    function setupFieldFormatting() {
+        // Height: auto-format on blur — "510" → 5'10", "61" → 6'1"
+        const heightEl = $('#height');
+        heightEl.addEventListener('blur', () => {
+            let v = heightEl.value.trim();
+            if (!v) return;
+            // Already formatted
+            if (v.includes("'") || v.includes('"')) return;
+            // Strip non-digits
+            const digits = v.replace(/\D/g, '');
+            if (!digits) return;
+            if (digits.length === 2) {
+                // "61" → 6'1"
+                heightEl.value = `${digits[0]}'${digits[1]}"`;
+            } else if (digits.length === 3) {
+                // "510" → 5'10"
+                heightEl.value = `${digits[0]}'${digits.slice(1)}"`;
+            } else if (digits.length === 1) {
+                // "6" → 6'0"
+                heightEl.value = `${digits[0]}'0"`;
+            }
+            updateCard();
+        });
+
+        // Weight: auto-append "lbs" on blur
+        const weightEl = $('#weight');
+        weightEl.addEventListener('blur', () => {
+            let v = weightEl.value.trim();
+            if (!v) return;
+            if (v.toLowerCase().includes('lb')) return;
+            const num = v.replace(/\D/g, '');
+            if (num) {
+                weightEl.value = `${num} lbs`;
+                updateCard();
+            }
+        });
+
+        // Birthdate: format the date nicely for display on card
+        const bdEl = $('#birthdate');
+        bdEl.addEventListener('change', () => updateCard());
+    }
+
+    // ===== AUTO-CALCULATE STATS =====
+    function setupAutoCalcStats() {
+        // Track which auto-calc fields the user has manually edited
+        const autoFields = ['stat_AVG', 'stat_OBP', 'stat_SLG', 'stat_OPS', 'stat_ERA', 'stat_WHIP'];
+        const userOverride = {};
+
+        autoFields.forEach(id => {
+            const el = $(`#${id}`);
+            el.addEventListener('input', () => {
+                if (el.value.trim()) {
+                    userOverride[id] = true;
+                    el.classList.add('user-override');
+                } else {
+                    userOverride[id] = false;
+                    el.classList.remove('user-override');
+                }
+            });
+        });
+
+        // Recalculate on any raw stat change
+        const battingRaw = ['stat_AB','stat_H','stat_2B','stat_3B','stat_HR','stat_BB'];
+        const pitchingRaw = ['stat_ER','stat_IP','stat_HA','stat_PBB'];
+
+        function recalcBatting() {
+            const ab = parseFloat($('#stat_AB').value) || 0;
+            const h = parseFloat($('#stat_H').value) || 0;
+            const bb = parseFloat($('#stat_BB').value) || 0;
+            const d = parseFloat($('#stat_2B').value) || 0;
+            const t = parseFloat($('#stat_3B').value) || 0;
+            const hr = parseFloat($('#stat_HR').value) || 0;
+
+            if (ab > 0) {
+                const avg = h / ab;
+                const singles = h - d - t - hr;
+                const tb = singles + 2 * d + 3 * t + 4 * hr;
+                const slg = tb / ab;
+                const obp = (ab + bb) > 0 ? (h + bb) / (ab + bb) : 0;
+                const ops = obp + slg;
+
+                if (!userOverride['stat_AVG']) $('#stat_AVG').value = '.' + avg.toFixed(3).slice(2);
+                if (!userOverride['stat_OBP']) $('#stat_OBP').value = '.' + obp.toFixed(3).slice(2);
+                if (!userOverride['stat_SLG']) $('#stat_SLG').value = '.' + slg.toFixed(3).slice(2);
+                if (!userOverride['stat_OPS']) $('#stat_OPS').value = ops.toFixed(3).replace(/^0/, '');
+            }
+        }
+
+        function recalcPitching() {
+            const ip = parseFloat($('#stat_IP').value) || 0;
+            const er = parseFloat($('#stat_ER').value) || 0;
+            const ha = parseFloat($('#stat_HA').value) || 0;
+            const bb = parseFloat($('#stat_PBB').value) || 0;
+
+            if (ip > 0) {
+                const era = (er / ip) * 9;
+                const whip = (ha + bb) / ip;
+                if (!userOverride['stat_ERA']) $('#stat_ERA').value = era.toFixed(2);
+                if (!userOverride['stat_WHIP']) $('#stat_WHIP').value = whip.toFixed(2);
+            }
+        }
+
+        battingRaw.forEach(id => {
+            const el = $(`#${id}`);
+            if (el) el.addEventListener('input', () => { recalcBatting(); updateCard(); });
+        });
+        pitchingRaw.forEach(id => {
+            const el = $(`#${id}`);
+            if (el) el.addEventListener('input', () => { recalcPitching(); updateCard(); });
+        });
     }
 
     // ===== CONTROLS =====
@@ -436,7 +551,14 @@
         $('#backBatThrow').textContent = `${$('#bats').value}/${$('#throws').value}`;
         const ht = $('#height').value, wt = $('#weight').value;
         $('#backHtWt').textContent = (ht || wt) ? `${ht || '-'} / ${wt || '-'}` : '-';
-        $('#backBorn').textContent = $('#birthdate').value || '-';
+        const bdRaw = $('#birthdate').value;
+        let bdDisplay = '-';
+        if (bdRaw) {
+            const [y, m, d] = bdRaw.split('-');
+            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            bdDisplay = `${months[parseInt(m)-1]} ${parseInt(d)}, ${y}`;
+        }
+        $('#backBorn').textContent = bdDisplay;
         $('#backHometown').textContent = $('#hometown').value || '-';
 
         // Stats
