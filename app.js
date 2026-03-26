@@ -404,54 +404,60 @@
         const bgLayer = $('#cardBgLayer');
         const nameplate = $('#cardNameplate');
 
-        // Card styles
+        // Card styles — bold borders, vivid gradients
         switch (style) {
             case 'classic':
-                bgLayer.style.background = `linear-gradient(180deg, ${primary} 0%, ${secondary} 100%)`;
+                bgLayer.style.background = `linear-gradient(180deg, ${primary} 0%, ${primary} 15%, ${secondary} 85%, ${secondary} 100%)`;
                 bgLayer.style.border = `${borderThickness}px solid ${primary}`;
                 bgLayer.style.borderImage = 'none';
-                nameplate.style.background = `linear-gradient(90deg, ${primary}, ${secondary})`;
+                nameplate.style.background = `linear-gradient(90deg, ${primary}ee, ${secondary}ee)`;
                 break;
             case 'modern':
-                bgLayer.style.background = `linear-gradient(135deg, ${secondary} 0%, #0a0a0a 40%, ${secondary} 100%)`;
+                bgLayer.style.background = `linear-gradient(160deg, ${secondary} 0%, #050510 35%, #050510 65%, ${secondary} 100%)`;
                 bgLayer.style.border = `${borderThickness}px solid ${accent}`;
-                nameplate.style.background = `linear-gradient(90deg, rgba(0,0,0,0.9), ${secondary}cc)`;
+                nameplate.style.background = `linear-gradient(90deg, rgba(0,0,0,0.92), ${secondary}dd)`;
                 break;
             case 'vintage':
-                bgLayer.style.background = `linear-gradient(180deg, #f5e6c8 0%, #e8d5a8 50%, #d4c090 100%)`;
+                bgLayer.style.background = `linear-gradient(180deg, #f5e6c8 0%, #eddcb0 20%, #e8d5a8 80%, #d4c090 100%)`;
                 bgLayer.style.border = `${borderThickness}px solid #8b7355`;
-                nameplate.style.background = `linear-gradient(90deg, #5d4037, #795548)`;
+                nameplate.style.background = `linear-gradient(90deg, #4a3228, #6d4c41, #4a3228)`;
                 break;
             case 'elite':
-                bgLayer.style.background = `linear-gradient(135deg, #0a0a1a 0%, ${secondary} 30%, #0a0a1a 60%, ${primary} 100%)`;
+                bgLayer.style.background = `linear-gradient(150deg, #0a0a1a 0%, ${secondary}88 25%, #0a0a1a 50%, ${primary}88 75%, #0a0a1a 100%)`;
                 bgLayer.style.border = `${borderThickness}px solid ${accent}`;
-                nameplate.style.background = `linear-gradient(90deg, rgba(0,0,0,0.95), ${primary}66, rgba(0,0,0,0.95))`;
+                nameplate.style.background = `linear-gradient(90deg, rgba(0,0,0,0.95), ${primary}55, rgba(0,0,0,0.95))`;
                 break;
             case 'rookie':
-                bgLayer.style.background = `linear-gradient(180deg, ${primary} 0%, #0a0a0a 50%, ${secondary} 100%)`;
+                bgLayer.style.background = `linear-gradient(180deg, ${primary} 0%, ${primary}88 20%, #0a0a0a 50%, ${secondary}88 80%, ${secondary} 100%)`;
                 bgLayer.style.border = `${borderThickness}px solid #FFD700`;
-                nameplate.style.background = `linear-gradient(90deg, ${primary}, #111, ${secondary})`;
+                nameplate.style.background = `linear-gradient(90deg, ${primary}dd, #111, ${secondary}dd)`;
                 break;
         }
+        bgLayer.style.borderRadius = '12px';
 
         // Top bar
-        $('#cardTopBar').style.background = `linear-gradient(90deg, ${secondary}cc, transparent)`;
+        $('#cardTopBar').style.background = `linear-gradient(90deg, ${secondary}dd, ${secondary}44, transparent)`;
 
-        // Name
+        // Name — auto-size with bolder feel
         const nameDisplay = $('#playerNameDisplay');
         nameDisplay.textContent = name;
         nameDisplay.style.color = nameColor;
-        nameDisplay.style.fontSize = name.length > 20 ? '1rem' : name.length > 15 ? '1.2rem' : '1.5rem';
+        nameDisplay.style.fontSize = name.length > 20 ? '1.05rem' : name.length > 15 ? '1.25rem' : '1.6rem';
 
         const teamDisplay = $('#teamNameDisplay');
         teamDisplay.textContent = team;
         teamDisplay.style.color = nameColor;
 
+        // Inner photo frame accent
+        const photoBorder = $('#cardPhotoBorder');
+        photoBorder.style.borderColor = `${accent}55`;
+        photoBorder.style.boxShadow = `0 0 0 1px rgba(0,0,0,0.4), inset 0 0 0 1px ${accent}22, inset 0 1px 3px rgba(0,0,0,0.2)`;
+
         // Nameplate accent line
         $('#nameplateAccent').style.background = `linear-gradient(90deg, ${accent}, ${primary}, transparent)`;
 
-        // Photo fade into nameplate
-        $('#cardPhotoFade').style.background = `linear-gradient(to bottom, transparent, ${secondary}cc)`;
+        // Photo fade into nameplate — smoother, more dramatic
+        $('#cardPhotoFade').style.background = `linear-gradient(to bottom, transparent 0%, ${secondary}33 40%, ${secondary}aa 70%, ${secondary}ee 100%)`;
 
         // Position badge
         const posBadge = $('#positionBadge');
