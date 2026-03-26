@@ -433,7 +433,7 @@ input[type="range"] {
     position: absolute;
     inset: 0;
     z-index: 0;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 
 /* Cardstock texture overlay — fine paper grain */
@@ -466,20 +466,21 @@ input[type="range"] {
         inset 0 1px 3px rgba(0,0,0,0.2);
 }
 
-/* Embossed card edge — layered for realism */
+/* Card edge — white paper core showing at cut edge + emboss */
 .card-edge {
     position: absolute;
     inset: 0;
     z-index: 19;
     pointer-events: none;
     border-radius: 5px;
+    border: 1px solid rgba(255,255,255,0.12);
     box-shadow:
-        inset 0 2px 0 rgba(255,255,255,0.2),
-        inset 0 -2px 0 rgba(0,0,0,0.35),
-        inset 2px 0 0 rgba(255,255,255,0.1),
-        inset -2px 0 0 rgba(0,0,0,0.2),
-        inset 0 0 8px rgba(0,0,0,0.15),
-        0 1px 2px rgba(0,0,0,0.3);
+        inset 0 1px 0 rgba(255,255,255,0.25),
+        inset 0 -1px 0 rgba(0,0,0,0.4),
+        inset 1px 0 0 rgba(255,255,255,0.12),
+        inset -1px 0 0 rgba(0,0,0,0.25),
+        inset 0 0 12px rgba(0,0,0,0.12),
+        0 0 0 0.5px rgba(255,255,255,0.15);
 }
 
 /* Foil effect */
@@ -489,7 +490,7 @@ input[type="range"] {
     z-index: 15;
     pointer-events: none;
     opacity: 0;
-    border-radius: 10px;
+    border-radius: 5px;
     background: linear-gradient(
         135deg,
         transparent 0%,
@@ -511,7 +512,7 @@ input[type="range"] {
     z-index: 16;
     pointer-events: none;
     opacity: 0;
-    border-radius: 10px;
+    border-radius: 5px;
     mix-blend-mode: color-dodge;
     transition: opacity 0.3s;
 }
@@ -597,6 +598,19 @@ input[type="range"] {
     border-radius: 0;
 }
 
+/* Subtle print halftone — makes photo feel printed on cardstock */
+.card-photo-area::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    opacity: 0.018;
+    background-image: radial-gradient(circle, #000 0.5px, transparent 0.5px);
+    background-size: 3px 3px;
+    mix-blend-mode: multiply;
+}
+
 /* Bottom fade from photo to nameplate — smooth blend */
 .card-photo-fade {
     position: absolute;
@@ -677,7 +691,7 @@ input[type="range"] {
     line-height: 1;
 }
 
-/* Name plate — bold banner */
+/* Name plate — bold banner with embossed depth */
 .card-nameplate {
     position: relative;
     z-index: 10;
@@ -687,7 +701,10 @@ input[type="range"] {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    border-top: 1px solid rgba(255,255,255,0.1);
+    border-top: 1px solid rgba(255,255,255,0.15);
+    box-shadow:
+        inset 0 2px 4px rgba(0,0,0,0.3),
+        inset 0 -1px 0 rgba(255,255,255,0.08);
 }
 .player-name-display {
     font-family: 'Anton', sans-serif;
@@ -839,19 +856,21 @@ input[type="range"] {
     mix-blend-mode: overlay;
 }
 
-/* Edge on back — matched to front */
+/* Edge on back — matches front cut-edge */
 .card-back-edge {
     position: absolute;
     inset: 0;
     z-index: 15;
     pointer-events: none;
     border-radius: 5px;
+    border: 1px solid rgba(255,255,255,0.1);
     box-shadow:
-        inset 0 2px 0 rgba(255,255,255,0.12),
-        inset 0 -2px 0 rgba(0,0,0,0.35),
-        inset 2px 0 0 rgba(255,255,255,0.07),
-        inset -2px 0 0 rgba(0,0,0,0.2),
-        inset 0 0 8px rgba(0,0,0,0.15);
+        inset 0 1px 0 rgba(255,255,255,0.2),
+        inset 0 -1px 0 rgba(0,0,0,0.4),
+        inset 1px 0 0 rgba(255,255,255,0.1),
+        inset -1px 0 0 rgba(0,0,0,0.25),
+        inset 0 0 12px rgba(0,0,0,0.12),
+        0 0 0 0.5px rgba(255,255,255,0.12);
 }
 
 /* Back small player headshot */
@@ -915,10 +934,11 @@ input[type="range"] {
     position: relative;
     z-index: 2;
     margin: 8px 12px;
-    background: rgba(0,0,0,0.25);
-    border-radius: 6px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 4px;
     padding: 6px 10px;
-    border: 1px solid rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
 }
 .info-row {
     display: flex;
