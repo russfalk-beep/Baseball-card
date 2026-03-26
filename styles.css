@@ -426,6 +426,7 @@ input[type="range"] {
 .baseball-card.front {
     display: flex;
     flex-direction: column;
+    padding: 8px 8px 0 8px;
 }
 
 /* Background layer — this IS the card border */
@@ -453,14 +454,15 @@ input[type="range"] {
 /* Inner photo frame — the colored border inside the white border */
 .card-photo-border {
     position: absolute;
-    top: 32px;
-    left: 10px;
-    right: 10px;
-    bottom: 58px;
+    top: 30px;
+    left: 8px;
+    right: 8px;
+    bottom: 0;
     z-index: 3;
     border: 3px solid;
     border-color: #c8102e;
-    border-radius: 2px;
+    border-bottom: none;
+    border-radius: 2px 2px 0 0;
     pointer-events: none;
     box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
 }
@@ -487,6 +489,7 @@ input[type="range"] {
     pointer-events: none;
     opacity: 0;
     border-radius: 4px;
+    overflow: hidden;
     background: linear-gradient(
         135deg,
         transparent 0%,
@@ -520,8 +523,8 @@ input[type="range"] {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 5px 12px;
-    min-height: 30px;
+    padding: 2px 4px;
+    min-height: 22px;
     background: transparent;
 }
 .brand-logo-display {
@@ -555,6 +558,7 @@ input[type="range"] {
     align-items: center;
     justify-content: center;
     background: #e8e8e8;
+    border-radius: 2px 2px 0 0;
 }
 .field-bg {
     position: absolute;
@@ -607,11 +611,11 @@ input[type="range"] {
 /* Team logo */
 .card-team-logo {
     position: absolute;
-    top: 36px;
+    top: 34px;
     right: 14px;
     z-index: 10;
-    width: 55px;
-    height: 55px;
+    width: 50px;
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -641,17 +645,17 @@ input[type="range"] {
 /* Position badge — clean circle like real Topps */
 .position-badge {
     position: absolute;
-    top: 36px;
+    top: 34px;
     left: 14px;
     z-index: 10;
     background: white;
     color: #111;
     font-family: 'Oswald', sans-serif;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    border-radius: 50% !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -663,13 +667,12 @@ input[type="range"] {
 /* Jersey number — subtle in border area */
 .jersey-number-display {
     position: absolute;
-    bottom: 62px;
+    bottom: 56px;
     right: 14px;
     z-index: 10;
     font-family: 'Anton', sans-serif;
     font-size: 1.2rem;
-    color: #999;
-    opacity: 0.3;
+    color: rgba(255,255,255,0.4);
     letter-spacing: -1px;
     line-height: 1;
 }
@@ -678,12 +681,14 @@ input[type="range"] {
 .card-nameplate {
     position: relative;
     z-index: 10;
-    padding: 8px 14px 10px;
+    padding: 6px 10px 8px;
     text-align: left;
-    min-height: 54px;
+    min-height: 50px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    margin: 0 -8px;
+    border-radius: 0 0 4px 4px;
 }
 .player-name-display {
     font-family: 'Anton', sans-serif;
@@ -716,7 +721,7 @@ input[type="range"] {
 /* Rookie badge */
 .rookie-badge {
     position: absolute;
-    bottom: 66px;
+    bottom: 56px;
     left: 10px;
     z-index: 12;
     background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%);
@@ -745,7 +750,7 @@ input[type="range"] {
 /* All-Star badge */
 .allstar-badge {
     position: absolute;
-    bottom: 66px;
+    bottom: 56px;
     right: 10px;
     z-index: 12;
     background: linear-gradient(135deg, #0d1b4a 0%, #1b3a8a 50%, #0d1b4a 100%);
@@ -767,7 +772,7 @@ input[type="range"] {
     inset: 0;
     z-index: 20;
     pointer-events: none;
-    border-radius: 5px;
+    border-radius: 4px;
     background:
         linear-gradient(
             135deg,
@@ -794,7 +799,7 @@ input[type="range"] {
     z-index: 10;
     font-family: 'Roboto Condensed', sans-serif;
     font-size: 0.55rem;
-    opacity: 0.4;
+    color: rgba(255,255,255,0.5);
     letter-spacing: 1px;
 }
 

@@ -404,32 +404,32 @@
         const bgLayer = $('#cardBgLayer');
         const nameplate = $('#cardNameplate');
 
-        // Card styles — real printed card: white border, team-colored inner frame
+        // Card styles — real printed card: white border, team-colored inner frame & nameplate
         switch (style) {
             case 'classic':
                 bgLayer.style.background = `white`;
-                bgLayer.style.border = `${borderThickness}px solid #e0e0e0`;
+                bgLayer.style.border = `none`;
                 bgLayer.style.borderImage = 'none';
                 nameplate.style.background = primary;
                 break;
             case 'modern':
                 bgLayer.style.background = `white`;
-                bgLayer.style.border = `${borderThickness}px solid ${primary}`;
+                bgLayer.style.border = `none`;
                 nameplate.style.background = `linear-gradient(90deg, ${primary}, ${secondary})`;
                 break;
             case 'vintage':
                 bgLayer.style.background = `#faf6ee`;
-                bgLayer.style.border = `${borderThickness}px solid #c8b78a`;
+                bgLayer.style.border = `none`;
                 nameplate.style.background = `#5c3d2e`;
                 break;
             case 'elite':
                 bgLayer.style.background = `white`;
-                bgLayer.style.border = `${borderThickness}px solid ${accent}`;
+                bgLayer.style.border = `none`;
                 nameplate.style.background = `linear-gradient(90deg, ${primary}, ${accent}, ${secondary})`;
                 break;
             case 'rookie':
                 bgLayer.style.background = `white`;
-                bgLayer.style.border = `${borderThickness}px solid #DAA520`;
+                bgLayer.style.border = `none`;
                 nameplate.style.background = primary;
                 break;
         }
