@@ -96,17 +96,19 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Height</label>
-                            <input type="text" id="height" placeholder="5'10&quot;" maxlength="6">
+                            <input type="text" id="height" placeholder="e.g. 510" maxlength="6">
+                            <span class="field-hint">Type digits: 510 → 5'10"</span>
                         </div>
                         <div class="form-group">
                             <label>Weight</label>
-                            <input type="text" id="weight" placeholder="175 lbs" maxlength="10">
+                            <input type="text" id="weight" placeholder="e.g. 175" maxlength="10">
+                            <span class="field-hint">Just the number</span>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Born</label>
-                            <input type="text" id="birthdate" placeholder="Aug 7, 2015" maxlength="20">
+                            <input type="date" id="birthdate">
                         </div>
                         <div class="form-group">
                             <label>Hometown</label>
@@ -273,25 +275,25 @@
                                 <input type="text" id="stat_SB" placeholder="0" maxlength="4">
                                 <span class="stat-label-full">Stolen Bases</span>
                             </div>
-                            <div class="stat-input">
+                            <div class="stat-input auto-calc">
                                 <label>AVG</label>
-                                <input type="text" id="stat_AVG" placeholder=".000" maxlength="5">
-                                <span class="stat-label-full">Batting Avg</span>
+                                <input type="text" id="stat_AVG" placeholder="auto" maxlength="5">
+                                <span class="stat-label-full">Auto: H/AB</span>
                             </div>
-                            <div class="stat-input">
+                            <div class="stat-input auto-calc">
                                 <label>OBP</label>
-                                <input type="text" id="stat_OBP" placeholder=".000" maxlength="5">
-                                <span class="stat-label-full">On-Base %</span>
+                                <input type="text" id="stat_OBP" placeholder="auto" maxlength="5">
+                                <span class="stat-label-full">Auto: (H+BB)/(AB+BB)</span>
                             </div>
-                            <div class="stat-input">
+                            <div class="stat-input auto-calc">
                                 <label>SLG</label>
-                                <input type="text" id="stat_SLG" placeholder=".000" maxlength="5">
-                                <span class="stat-label-full">Slugging %</span>
+                                <input type="text" id="stat_SLG" placeholder="auto" maxlength="5">
+                                <span class="stat-label-full">Auto: TB/AB</span>
                             </div>
-                            <div class="stat-input">
+                            <div class="stat-input auto-calc">
                                 <label>OPS</label>
-                                <input type="text" id="stat_OPS" placeholder=".000" maxlength="5">
-                                <span class="stat-label-full">OPS</span>
+                                <input type="text" id="stat_OPS" placeholder="auto" maxlength="5">
+                                <span class="stat-label-full">Auto: OBP+SLG</span>
                             </div>
                         </div>
                     </div>
@@ -309,10 +311,10 @@
                                 <input type="text" id="stat_L" placeholder="0" maxlength="3">
                                 <span class="stat-label-full">Losses</span>
                             </div>
-                            <div class="stat-input">
+                            <div class="stat-input auto-calc">
                                 <label>ERA</label>
-                                <input type="text" id="stat_ERA" placeholder="0.00" maxlength="5">
-                                <span class="stat-label-full">Earned Run Avg</span>
+                                <input type="text" id="stat_ERA" placeholder="auto" maxlength="5">
+                                <span class="stat-label-full">Auto: (ER/IP)*9</span>
                             </div>
                             <div class="stat-input">
                                 <label>GP</label>
@@ -354,10 +356,10 @@
                                 <input type="text" id="stat_K" placeholder="0" maxlength="4">
                                 <span class="stat-label-full">Strikeouts</span>
                             </div>
-                            <div class="stat-input">
+                            <div class="stat-input auto-calc">
                                 <label>WHIP</label>
-                                <input type="text" id="stat_WHIP" placeholder="0.00" maxlength="5">
-                                <span class="stat-label-full">WHIP</span>
+                                <input type="text" id="stat_WHIP" placeholder="auto" maxlength="5">
+                                <span class="stat-label-full">Auto: (H+BB)/IP</span>
                             </div>
                         </div>
                     </div>
