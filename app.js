@@ -404,39 +404,39 @@
         const bgLayer = $('#cardBgLayer');
         const nameplate = $('#cardNameplate');
 
-        // Card styles — bold borders, vivid gradients
+        // Card styles — real printed card: white border, team-colored inner frame
         switch (style) {
             case 'classic':
-                bgLayer.style.background = `linear-gradient(180deg, ${primary} 0%, ${primary} 15%, ${secondary} 85%, ${secondary} 100%)`;
-                bgLayer.style.border = `${borderThickness}px solid ${primary}`;
+                bgLayer.style.background = `white`;
+                bgLayer.style.border = `${borderThickness}px solid #e0e0e0`;
                 bgLayer.style.borderImage = 'none';
-                nameplate.style.background = `linear-gradient(90deg, ${primary}ee, ${secondary}ee)`;
+                nameplate.style.background = primary;
                 break;
             case 'modern':
-                bgLayer.style.background = `linear-gradient(160deg, ${secondary} 0%, #050510 35%, #050510 65%, ${secondary} 100%)`;
-                bgLayer.style.border = `${borderThickness}px solid ${accent}`;
-                nameplate.style.background = `linear-gradient(90deg, rgba(0,0,0,0.92), ${secondary}dd)`;
+                bgLayer.style.background = `white`;
+                bgLayer.style.border = `${borderThickness}px solid ${primary}`;
+                nameplate.style.background = `linear-gradient(90deg, ${primary}, ${secondary})`;
                 break;
             case 'vintage':
-                bgLayer.style.background = `linear-gradient(180deg, #f5e6c8 0%, #eddcb0 20%, #e8d5a8 80%, #d4c090 100%)`;
-                bgLayer.style.border = `${borderThickness}px solid #8b7355`;
-                nameplate.style.background = `linear-gradient(90deg, #4a3228, #6d4c41, #4a3228)`;
+                bgLayer.style.background = `#faf6ee`;
+                bgLayer.style.border = `${borderThickness}px solid #c8b78a`;
+                nameplate.style.background = `#5c3d2e`;
                 break;
             case 'elite':
-                bgLayer.style.background = `linear-gradient(150deg, #0a0a1a 0%, ${secondary}88 25%, #0a0a1a 50%, ${primary}88 75%, #0a0a1a 100%)`;
+                bgLayer.style.background = `white`;
                 bgLayer.style.border = `${borderThickness}px solid ${accent}`;
-                nameplate.style.background = `linear-gradient(90deg, rgba(0,0,0,0.95), ${primary}55, rgba(0,0,0,0.95))`;
+                nameplate.style.background = `linear-gradient(90deg, ${primary}, ${accent}, ${secondary})`;
                 break;
             case 'rookie':
-                bgLayer.style.background = `linear-gradient(180deg, ${primary} 0%, ${primary}88 20%, #0a0a0a 50%, ${secondary}88 80%, ${secondary} 100%)`;
-                bgLayer.style.border = `${borderThickness}px solid #FFD700`;
-                nameplate.style.background = `linear-gradient(90deg, ${primary}dd, #111, ${secondary}dd)`;
+                bgLayer.style.background = `white`;
+                bgLayer.style.border = `${borderThickness}px solid #DAA520`;
+                nameplate.style.background = primary;
                 break;
         }
-        bgLayer.style.borderRadius = '5px';
+        bgLayer.style.borderRadius = '4px';
 
-        // Top bar
-        $('#cardTopBar').style.background = `linear-gradient(90deg, ${secondary}dd, ${secondary}44, transparent)`;
+        // Top bar — clean, sits in white border
+        $('#cardTopBar').style.background = `transparent`;
 
         // Name — auto-size with bolder feel
         const nameDisplay = $('#playerNameDisplay');
@@ -448,16 +448,17 @@
         teamDisplay.textContent = team;
         teamDisplay.style.color = nameColor;
 
-        // Inner photo frame accent
+        // Inner photo frame — team-colored solid border
         const photoBorder = $('#cardPhotoBorder');
-        photoBorder.style.borderColor = `${accent}55`;
-        photoBorder.style.boxShadow = `0 0 0 1px rgba(0,0,0,0.4), inset 0 0 0 1px ${accent}22, inset 0 1px 3px rgba(0,0,0,0.2)`;
+        photoBorder.style.borderColor = primary;
+        photoBorder.style.boxShadow = `0 0 0 1px rgba(0,0,0,0.1)`;
 
-        // Nameplate accent line
-        $('#nameplateAccent').style.background = `linear-gradient(90deg, ${accent}, ${primary}, transparent)`;
+        // Nameplate accent line — team accent color
+        $('#nameplateAccent').style.background = accent;
 
-        // Photo fade into nameplate — smoother, more dramatic
-        $('#cardPhotoFade').style.background = `linear-gradient(to bottom, transparent 0%, ${secondary}33 40%, ${secondary}aa 70%, ${secondary}ee 100%)`;
+        // Photo fade — gentle blend into nameplate
+        const nameplateColor = style === 'vintage' ? '#5c3d2e' : primary;
+        $('#cardPhotoFade').style.background = `linear-gradient(to bottom, transparent 50%, ${nameplateColor}cc 85%, ${nameplateColor} 100%)`;
 
         // Position badge
         const posBadge = $('#positionBadge');
@@ -535,12 +536,12 @@
         const secondary = $('#secondaryColor').value;
         const accent = $('#accentColor').value;
 
-        $('#cardBackBg').style.background = `linear-gradient(180deg, ${secondary} 0%, #0a0a0a 40%, ${secondary}99 100%)`;
+        $('#cardBackBg').style.background = `#f0efe8`;
         $('#backNumber').textContent = `#${number}`;
         $('#backName').textContent = name;
         $('#backTeam').textContent = team;
-        $('#backHeader').style.background = `linear-gradient(90deg, ${primary}cc, ${secondary}cc)`;
-        $('#backAccentLine').style.background = `linear-gradient(90deg, ${accent}, ${primary}, transparent)`;
+        $('#backHeader').style.background = primary;
+        $('#backAccentLine').style.background = accent;
 
         // Headshot on back
         const headshot = $('#backHeadshot');
@@ -598,7 +599,7 @@
             const el = $(`#stat_${s}`); vals[s] = el ? (el.value || '-') : '-';
         });
         const r1 = ['G','AB','R','H','HR','RBI','BB','SB'], r2 = ['2B','3B','SO','AVG','OBP','SLG','OPS'];
-        let h = year || league ? `<div style="font-size:0.55rem;color:rgba(255,255,255,0.45);text-align:center;margin-bottom:3px;letter-spacing:1px;text-transform:uppercase">${year} ${league?'- '+league:''} SEASON STATS</div>` : '';
+        let h = year || league ? `<div style="font-size:0.55rem;color:rgba(0,0,0,0.45);text-align:center;margin-bottom:3px;letter-spacing:1px;text-transform:uppercase">${year} ${league?'- '+league:''} SEASON STATS</div>` : '';
         h += `<table class="stats-table"><tr>${r1.map(s=>`<th>${s}</th>`).join('')}</tr><tr>${r1.map(s=>`<td>${vals[s]}</td>`).join('')}</tr></table>`;
         h += `<table class="stats-table" style="margin-top:3px"><tr>${r2.map(s=>`<th>${s}</th>`).join('')}</tr><tr>${r2.map(s=>`<td>${vals[s]}</td>`).join('')}</tr></table>`;
         return h;
@@ -607,7 +608,7 @@
     function buildPitchingStats(year, league) {
         const ids = [['W','stat_W'],['L','stat_L'],['ERA','stat_ERA'],['GP','stat_GP'],['GS','stat_GS'],['SV','stat_SV'],['IP','stat_IP'],['H','stat_HA'],['ER','stat_ER'],['BB','stat_PBB'],['K','stat_K'],['WHIP','stat_WHIP']];
         const r1 = ids.slice(0,6), r2 = ids.slice(6);
-        let h = year || league ? `<div style="font-size:0.55rem;color:rgba(255,255,255,0.45);text-align:center;margin-bottom:3px;letter-spacing:1px;text-transform:uppercase">${year} ${league?'- '+league:''} SEASON STATS</div>` : '';
+        let h = year || league ? `<div style="font-size:0.55rem;color:rgba(0,0,0,0.45);text-align:center;margin-bottom:3px;letter-spacing:1px;text-transform:uppercase">${year} ${league?'- '+league:''} SEASON STATS</div>` : '';
         h += `<table class="stats-table"><tr>${r1.map(([l])=>`<th>${l}</th>`).join('')}</tr><tr>${r1.map(([,id])=>`<td>${$(`#${id}`).value||'-'}</td>`).join('')}</tr></table>`;
         h += `<table class="stats-table" style="margin-top:3px"><tr>${r2.map(([l])=>`<th>${l}</th>`).join('')}</tr><tr>${r2.map(([,id])=>`<td>${$(`#${id}`).value||'-'}</td>`).join('')}</tr></table>`;
         return h;
