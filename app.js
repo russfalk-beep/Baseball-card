@@ -2,7 +2,7 @@
 (function () {
     'use strict';
 
-    const state = { playerPhoto: null, teamLogo: null, brandLogo: null, showFront: true, isPitcher: false };
+    const state = { playerPhoto: null, teamLogo: null, brandLogo: null, leagueLogo: null, showFront: true, isPitcher: false };
     const $ = (sel) => document.querySelector(sel);
     const $$ = (sel) => document.querySelectorAll(sel);
 
@@ -42,9 +42,16 @@
         setupUpload('playerPhoto', 'playerPhotoUpload', 'playerPhotoPreview', 'playerPhotoPlaceholder', 'playerPhotoControls', img => { state.playerPhoto = img; updateCard(); });
         setupUpload('teamLogo', 'teamLogoUpload', 'teamLogoPreview', 'teamLogoPlaceholder', 'teamLogoControls', img => { state.teamLogo = img; updateCard(); });
         setupUpload('brandLogo', 'brandLogoUpload', 'brandLogoPreview', 'brandLogoPlaceholder', 'brandLogoControls', img => { state.brandLogo = img; updateCard(); });
+        setupUpload('leagueLogo', 'leagueLogoUpload', 'leagueLogoPreview', 'leagueLogoPlaceholder', 'leagueLogoControls', img => { state.leagueLogo = img; updateCard(); });
 
+        const removeButtons = {
+            playerPhoto: 'removePlayerPhoto',
+            teamLogo: 'removeTeamLogo',
+            brandLogo: 'removeBrandLogo',
+            leagueLogo: 'removeLeagueLogo'
+        };
         const removeHandler = (key, previewId, placeholderId, controlsId, boxId, inputId) => {
-            $(`#${key === 'playerPhoto' ? 'removePlayerPhoto' : key === 'teamLogo' ? 'removeTeamLogo' : 'removeBrandLogo'}`).addEventListener('click', () => {
+            $(`#${removeButtons[key]}`).addEventListener('click', () => {
                 state[key] = null;
                 $(`#${previewId}`).style.display = 'none';
                 $(`#${placeholderId}`).style.display = 'flex';
@@ -57,6 +64,7 @@
         removeHandler('playerPhoto', 'playerPhotoPreview', 'playerPhotoPlaceholder', 'playerPhotoControls', 'playerPhotoUpload', 'playerPhoto');
         removeHandler('teamLogo', 'teamLogoPreview', 'teamLogoPlaceholder', 'teamLogoControls', 'teamLogoUpload', 'teamLogo');
         removeHandler('brandLogo', 'brandLogoPreview', 'brandLogoPlaceholder', 'brandLogoControls', 'brandLogoUpload', 'brandLogo');
+        removeHandler('leagueLogo', 'leagueLogoPreview', 'leagueLogoPlaceholder', 'leagueLogoControls', 'leagueLogoUpload', 'leagueLogo');
     }
 
     function setupUpload(inputId, boxId, previewId, placeholderId, controlsId, callback) {
@@ -94,7 +102,7 @@
             'showGloss','showFoil','showRookieBadge','showAllStar','show3DTilt',
             'borderThickness','vignetteStrength','showOnField',
             'playerPhotoZoom','playerPhotoX','playerPhotoY','playerBrightness','playerContrast','playerSaturation',
-            'teamLogoSize','brandLogoSize'
+            'teamLogoSize','brandLogoSize','leagueLogoSize'
         ];
         allInputs.forEach(id => {
             const el = $(`#${id}`);
@@ -159,73 +167,64 @@
     }
 
     // ===== AUTO-CALCULATE STATS =====
-    function setupAutoCalcStats() {
-        // Track which auto-calc fields the user has manually edited
-        const autoFields = ['stat_AVG', 'stat_OBP', 'stat_SLG', 'stat_OPS', 'stat_ERA', 'stat_WHIP'];
-        const userOverride = {};
+    // Track which auto-calc fields the user has manually typed into
+    const userOverride = {};
 
+    function setupAutoCalcStats() {
+        const autoFields = ['stat_AVG', 'stat_OBP', 'stat_SLG', 'stat_OPS', 'stat_ERA', 'stat_WHIP'];
         autoFields.forEach(id => {
             const el = $(`#${id}`);
+            // Detect manual user input (keyboard typing only)
+            el.addEventListener('keydown', () => {
+                userOverride[id] = true;
+                el.classList.add('user-override');
+            });
+            // Clearing the field resets override
             el.addEventListener('input', () => {
-                if (el.value.trim()) {
-                    userOverride[id] = true;
-                    el.classList.add('user-override');
-                } else {
+                if (!el.value.trim()) {
                     userOverride[id] = false;
                     el.classList.remove('user-override');
                 }
             });
         });
+    }
 
-        // Recalculate on any raw stat change
-        const battingRaw = ['stat_AB','stat_H','stat_2B','stat_3B','stat_HR','stat_BB'];
-        const pitchingRaw = ['stat_ER','stat_IP','stat_HA','stat_PBB'];
+    // Called from within updateCard so it always runs
+    function recalcStats() {
+        // Batting
+        const ab = parseFloat($('#stat_AB').value) || 0;
+        const h = parseFloat($('#stat_H').value) || 0;
+        const bb = parseFloat($('#stat_BB').value) || 0;
+        const d = parseFloat($('#stat_2B').value) || 0;
+        const t = parseFloat($('#stat_3B').value) || 0;
+        const hr = parseFloat($('#stat_HR').value) || 0;
 
-        function recalcBatting() {
-            const ab = parseFloat($('#stat_AB').value) || 0;
-            const h = parseFloat($('#stat_H').value) || 0;
-            const bb = parseFloat($('#stat_BB').value) || 0;
-            const d = parseFloat($('#stat_2B').value) || 0;
-            const t = parseFloat($('#stat_3B').value) || 0;
-            const hr = parseFloat($('#stat_HR').value) || 0;
+        if (ab > 0) {
+            const avg = h / ab;
+            const singles = Math.max(0, h - d - t - hr);
+            const tb = singles + 2 * d + 3 * t + 4 * hr;
+            const slg = tb / ab;
+            const obp = (ab + bb) > 0 ? (h + bb) / (ab + bb) : 0;
+            const ops = obp + slg;
 
-            if (ab > 0) {
-                const avg = h / ab;
-                const singles = h - d - t - hr;
-                const tb = singles + 2 * d + 3 * t + 4 * hr;
-                const slg = tb / ab;
-                const obp = (ab + bb) > 0 ? (h + bb) / (ab + bb) : 0;
-                const ops = obp + slg;
-
-                if (!userOverride['stat_AVG']) $('#stat_AVG').value = '.' + avg.toFixed(3).slice(2);
-                if (!userOverride['stat_OBP']) $('#stat_OBP').value = '.' + obp.toFixed(3).slice(2);
-                if (!userOverride['stat_SLG']) $('#stat_SLG').value = '.' + slg.toFixed(3).slice(2);
-                if (!userOverride['stat_OPS']) $('#stat_OPS').value = ops.toFixed(3).replace(/^0/, '');
-            }
+            if (!userOverride['stat_AVG']) $('#stat_AVG').value = avg >= 1 ? avg.toFixed(3) : '.' + avg.toFixed(3).split('.')[1];
+            if (!userOverride['stat_OBP']) $('#stat_OBP').value = obp >= 1 ? obp.toFixed(3) : '.' + obp.toFixed(3).split('.')[1];
+            if (!userOverride['stat_SLG']) $('#stat_SLG').value = slg >= 1 ? slg.toFixed(3) : '.' + slg.toFixed(3).split('.')[1];
+            if (!userOverride['stat_OPS']) $('#stat_OPS').value = ops >= 1 ? ops.toFixed(3) : '.' + ops.toFixed(3).split('.')[1];
         }
 
-        function recalcPitching() {
-            const ip = parseFloat($('#stat_IP').value) || 0;
-            const er = parseFloat($('#stat_ER').value) || 0;
-            const ha = parseFloat($('#stat_HA').value) || 0;
-            const bb = parseFloat($('#stat_PBB').value) || 0;
+        // Pitching
+        const ip = parseFloat($('#stat_IP').value) || 0;
+        const er = parseFloat($('#stat_ER').value) || 0;
+        const ha = parseFloat($('#stat_HA').value) || 0;
+        const pbb = parseFloat($('#stat_PBB').value) || 0;
 
-            if (ip > 0) {
-                const era = (er / ip) * 9;
-                const whip = (ha + bb) / ip;
-                if (!userOverride['stat_ERA']) $('#stat_ERA').value = era.toFixed(2);
-                if (!userOverride['stat_WHIP']) $('#stat_WHIP').value = whip.toFixed(2);
-            }
+        if (ip > 0) {
+            const era = (er / ip) * 9;
+            const whip = (ha + pbb) / ip;
+            if (!userOverride['stat_ERA']) $('#stat_ERA').value = era.toFixed(2);
+            if (!userOverride['stat_WHIP']) $('#stat_WHIP').value = whip.toFixed(2);
         }
-
-        battingRaw.forEach(id => {
-            const el = $(`#${id}`);
-            if (el) el.addEventListener('input', () => { recalcBatting(); updateCard(); });
-        });
-        pitchingRaw.forEach(id => {
-            const el = $(`#${id}`);
-            if (el) el.addEventListener('input', () => { recalcPitching(); updateCard(); });
-        });
     }
 
     // ===== CONTROLS =====
@@ -384,7 +383,7 @@
     }
 
     // ===== UPDATE CARD =====
-    function updateCard() { updateFront(); updateBack(); }
+    function updateCard() { recalcStats(); updateFront(); updateBack(); }
 
     function updateFront() {
         const name = $('#playerName').value || 'PLAYER NAME';
@@ -570,6 +569,17 @@
         const bio = $('#bio').value;
         $('#backBio').style.display = bio ? 'block' : 'none';
         $('#backBioText').textContent = bio;
+
+        // League logo
+        const leagueLogoArea = $('#backLeagueLogo');
+        if (state.leagueLogo) {
+            const logoSize = parseInt($('#leagueLogoSize').value);
+            $('#leagueLogoDisplay').src = state.leagueLogo.src;
+            $('#leagueLogoDisplay').style.height = `${logoSize}px`;
+            leagueLogoArea.style.display = 'flex';
+        } else {
+            leagueLogoArea.style.display = 'none';
+        }
 
         // Footer
         $('#backCardNumber').textContent = cardNum ? `No. ${cardNum}` : '';

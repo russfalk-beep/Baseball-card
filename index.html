@@ -182,6 +182,24 @@
                     </div>
 
                     <div class="upload-section">
+                        <label class="upload-label">League Logo</label>
+                        <p class="upload-hint">Your Little League or league logo. Shows on back of card. PNG with transparency works best.</p>
+                        <div class="upload-box small" id="leagueLogoUpload">
+                            <input type="file" id="leagueLogo" accept="image/*" hidden>
+                            <div class="upload-placeholder" id="leagueLogoPlaceholder">
+                                <svg viewBox="0 0 64 64" width="36" height="36"><circle cx="32" cy="28" r="18" fill="none" stroke="#999" stroke-width="2"/><path d="M20 50 L32 42 L44 50" fill="none" stroke="#999" stroke-width="2"/><text x="32" y="32" text-anchor="middle" font-size="8" fill="#999">LEAGUE</text></svg>
+                                <span>Upload league logo</span>
+                            </div>
+                            <img id="leagueLogoPreview" class="upload-preview" style="display:none">
+                        </div>
+                        <div class="photo-controls" id="leagueLogoControls" style="display:none">
+                            <label>Logo Size</label>
+                            <input type="range" id="leagueLogoSize" min="30" max="120" step="1" value="60">
+                            <button class="btn-secondary" id="removeLeagueLogo">Remove Logo</button>
+                        </div>
+                    </div>
+
+                    <div class="upload-section">
                         <label class="upload-label">Series / Brand Logo (optional)</label>
                         <p class="upload-hint">e.g. Topps, Upper Deck style logo for top of card.</p>
                         <div class="upload-box small" id="brandLogoUpload">
@@ -593,6 +611,11 @@
                             <!-- Bio -->
                             <div class="back-bio" id="backBio">
                                 <p id="backBioText"></p>
+                            </div>
+
+                            <!-- League logo -->
+                            <div class="back-league-logo" id="backLeagueLogo" style="display:none">
+                                <img id="leagueLogoDisplay">
                             </div>
 
                             <!-- Baseball watermark -->
