@@ -624,7 +624,8 @@ input[type="range"] {
 
 /* Checkerboard for logo upload previews to show transparency */
 #teamLogoUpload.has-image,
-#brandLogoUpload.has-image {
+#brandLogoUpload.has-image,
+#leagueLogoUpload.has-image {
     background-image: linear-gradient(45deg, #2a2a3e 25%, transparent 25%),
         linear-gradient(-45deg, #2a2a3e 25%, transparent 25%),
         linear-gradient(45deg, transparent 75%, #2a2a3e 75%),
@@ -957,6 +958,26 @@ input[type="range"] {
     line-height: 1.35;
     color: rgba(255,255,255,0.8);
     font-style: italic;
+}
+
+/* League logo on back */
+.back-league-logo {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px 12px;
+    background: transparent;
+}
+.back-league-logo img {
+    height: 50px;
+    width: auto;
+    max-width: 80%;
+    object-fit: contain;
+    opacity: 0.85;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+    background: transparent;
 }
 
 /* Back baseball icon watermark */
@@ -1321,6 +1342,8 @@ input[type="range"] {
     .print-card .stats-table td { font-size: 0.42rem !important; padding: 2px 1px !important; }
     .print-card .back-bio { margin: 3px 8px !important; padding: 4px 6px !important; }
     .print-card .back-bio p { font-size: 0.4rem !important; }
+    .print-card .back-league-logo { padding: 3px 8px !important; }
+    .print-card .back-league-logo img { height: 32px !important; }
     .print-card .back-footer { padding: 3px 8px !important; font-size: 0.32rem !important; }
     .print-card .back-copyright { font-size: 0.28rem !important; }
     .print-card .back-headshot-area { width: 34px !important; height: 34px !important; top: 6px !important; right: 8px !important; }
