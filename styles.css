@@ -70,7 +70,7 @@ body {
     min-width: 340px;
     max-width: 480px;
     background: var(--bg-panel);
-    border-radius: 12px;
+    border-radius: 5px;
     border: 1px solid var(--border);
     overflow: hidden;
 }
@@ -416,7 +416,7 @@ input[type="range"] {
 .baseball-card {
     width: 100%;
     height: 100%;
-    border-radius: 12px;
+    border-radius: 5px;
     position: relative;
     overflow: hidden;
     background: #222;
@@ -442,7 +442,7 @@ input[type="range"] {
     inset: 0;
     z-index: 18;
     pointer-events: none;
-    border-radius: 12px;
+    border-radius: 5px;
     opacity: 0.06;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
     background-size: 128px 128px;
@@ -472,7 +472,7 @@ input[type="range"] {
     inset: 0;
     z-index: 19;
     pointer-events: none;
-    border-radius: 12px;
+    border-radius: 5px;
     box-shadow:
         inset 0 2px 0 rgba(255,255,255,0.2),
         inset 0 -2px 0 rgba(0,0,0,0.35),
@@ -782,7 +782,7 @@ input[type="range"] {
     inset: 0;
     z-index: 20;
     pointer-events: none;
-    border-radius: 12px;
+    border-radius: 5px;
     background:
         linear-gradient(
             135deg,
@@ -822,7 +822,7 @@ input[type="range"] {
 .card-back-bg {
     position: absolute;
     inset: 0;
-    border-radius: 12px;
+    border-radius: 5px;
     z-index: 0;
 }
 
@@ -832,7 +832,7 @@ input[type="range"] {
     inset: 0;
     z-index: 1;
     pointer-events: none;
-    border-radius: 12px;
+    border-radius: 5px;
     opacity: 0.08;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.0' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
     background-size: 128px 128px;
@@ -845,7 +845,7 @@ input[type="range"] {
     inset: 0;
     z-index: 15;
     pointer-events: none;
-    border-radius: 12px;
+    border-radius: 5px;
     box-shadow:
         inset 0 2px 0 rgba(255,255,255,0.12),
         inset 0 -2px 0 rgba(0,0,0,0.35),
@@ -1327,7 +1327,7 @@ input[type="range"] {
         width: 2.5in;
         height: 3.5in;
         overflow: hidden;
-        border-radius: 6px;
+        border-radius: 3px;
         position: relative;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -1336,7 +1336,7 @@ input[type="range"] {
     .print-card .baseball-card {
         width: 2.5in !important;
         height: 3.5in !important;
-        border-radius: 6px;
+        border-radius: 3px;
         font-size: 6.5pt;
     }
     .print-card .card-container {
