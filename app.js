@@ -864,47 +864,94 @@
             }, 'image/png');
         });
 
-        // ===== AUTO BACKGROUND REMOVAL =====
+        // ===== AUTO BACKGROUND REMOVAL (MediaPipe Selfie Segmentation) =====
+        let segmenter = null;
+
+        async function initSegmenter() {
+            if (segmenter) return segmenter;
+            segmenter = new SelfieSegmentation({
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`
+            });
+            segmenter.setOptions({ modelSelection: 1 }); // 1 = landscape (better for full-body)
+            return new Promise((resolve, reject) => {
+                segmenter.onResults((results) => {
+                    resolve(results);
+                });
+                // Warm up with a tiny canvas to trigger model load
+                const tiny = document.createElement('canvas');
+                tiny.width = 2; tiny.height = 2;
+                segmenter.send({ image: tiny }).catch(reject);
+            }).then(() => segmenter);
+        }
+
         async function runAutoRemove() {
             loading.style.display = 'flex';
-            loadingText.textContent = 'Loading AI model (first time may take 15-30s)...';
+            loadingText.textContent = 'Loading AI model...';
 
             try {
-                const { removeBackground } = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/index.js');
+                // Prepare source image at full resolution for segmentation
+                const srcCanvas = document.createElement('canvas');
+                srcCanvas.width = canvas.width;
+                srcCanvas.height = canvas.height;
+                const srcCtx = srcCanvas.getContext('2d');
+                srcCtx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
+
+                // Init segmenter
+                const seg = new SelfieSegmentation({
+                    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`
+                });
+                seg.setOptions({ modelSelection: 1 });
+
+                loadingText.textContent = 'Analyzing image...';
+
+                const maskPromise = new Promise((resolve, reject) => {
+                    seg.onResults((results) => {
+                        resolve(results.segmentationMask);
+                    });
+                    // Small timeout for safety
+                    setTimeout(() => reject(new Error('Segmentation timed out')), 30000);
+                });
+
+                await seg.send({ image: srcCanvas });
+                const mask = await maskPromise;
 
                 loadingText.textContent = 'Removing background...';
 
-                // Convert original image to blob
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = originalImage.naturalWidth || originalImage.width;
-                tempCanvas.height = originalImage.naturalHeight || originalImage.height;
-                const tempCtx = tempCanvas.getContext('2d');
-                tempCtx.drawImage(originalImage, 0, 0);
+                // Apply mask: draw original image, then erase background using mask
+                // The mask is a canvas/image where white = person, black = background
+                const maskCanvas = document.createElement('canvas');
+                maskCanvas.width = canvas.width;
+                maskCanvas.height = canvas.height;
+                const maskCtx = maskCanvas.getContext('2d');
+                maskCtx.drawImage(mask, 0, 0, canvas.width, canvas.height);
 
-                const inputBlob = await new Promise(resolve => tempCanvas.toBlob(resolve, 'image/png'));
+                const maskData = maskCtx.getImageData(0, 0, canvas.width, canvas.height);
+                const imgData = srcCtx.getImageData(0, 0, canvas.width, canvas.height);
 
-                const resultBlob = await removeBackground(inputBlob, {
-                    progress: (key, current, total) => {
-                        if (key === 'compute:inference') {
-                            loadingText.textContent = 'Processing image...';
-                        }
+                // Apply mask to alpha channel — mask R channel > threshold = keep
+                for (let i = 0; i < imgData.data.length; i += 4) {
+                    const confidence = maskData.data[i]; // R channel = person confidence
+                    if (confidence < 128) {
+                        // Background — make transparent
+                        imgData.data[i + 3] = 0;
+                    } else if (confidence < 200) {
+                        // Edge — partial transparency for smooth edges
+                        imgData.data[i + 3] = Math.round((confidence - 128) / 72 * 255);
                     }
-                });
+                    // else: fully opaque (person)
+                }
 
-                // Draw result onto editor canvas
-                const resultImg = new Image();
-                resultImg.onload = () => {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(resultImg, 0, 0, canvas.width, canvas.height);
-                    bgRemoved = true;
-                    loading.style.display = 'none';
-                };
-                resultImg.src = URL.createObjectURL(resultBlob);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.putImageData(imgData, 0, 0);
+                bgRemoved = true;
+                loading.style.display = 'none';
+
+                seg.close();
 
             } catch (err) {
                 console.error('Auto background removal failed:', err);
-                loadingText.textContent = 'Auto-removal unavailable. Use the eraser tool instead.';
-                setTimeout(() => { loading.style.display = 'none'; }, 2000);
+                loadingText.textContent = 'Auto-removal failed. Use the eraser tool to remove background manually.';
+                setTimeout(() => { loading.style.display = 'none'; }, 2500);
             }
         }
 

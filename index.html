@@ -6,6 +6,7 @@
     <title>Baseball Card Maker Pro</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto+Condensed:wght@400;700&family=Anton&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <div class="app-container">
@@ -731,7 +732,7 @@
                 <div class="editor-loading" id="editorLoading" style="display:none">
                     <div class="loading-spinner"></div>
                     <p id="editorLoadingText">Removing background...</p>
-                    <p class="loading-subtext">This may take 15-30 seconds on first use</p>
+                    <p class="loading-subtext">First use downloads the AI model (~5 seconds)</p>
                 </div>
                 <canvas id="editorCanvas"></canvas>
                 <canvas id="editorOverlay" class="editor-overlay-canvas"></canvas>
