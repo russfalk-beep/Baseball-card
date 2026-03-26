@@ -758,6 +758,269 @@
         }
     }
 
+    // ===== PHOTO EDITOR (Background Removal + Touch-up) =====
+    (function setupPhotoEditor() {
+        const overlay = $('#photoEditorOverlay');
+        const canvas = $('#editorCanvas');
+        const ctx = canvas.getContext('2d');
+        const loading = $('#editorLoading');
+        const loadingText = $('#editorLoadingText');
+
+        let originalImage = null;   // original uploaded image (Image element)
+        let originalData = null;    // original pixel data (ImageData)
+        let currentTool = 'eraser';
+        let brushSize = 25;
+        let brushSoftness = 0;
+        let isDrawing = false;
+        let bgRemoved = false;
+
+        // Open editor from "Remove Background" button
+        $('#removeBgBtn').addEventListener('click', () => {
+            if (!state.playerPhoto) return;
+            openEditor(state.playerPhoto, true);
+        });
+
+        // Open editor from "Touch Up Cutout" button
+        $('#editCutoutBtn').addEventListener('click', () => {
+            if (!state.playerPhoto) return;
+            openEditor(state.playerPhoto, false);
+        });
+
+        function openEditor(img, autoRemove) {
+            overlay.classList.add('open');
+            originalImage = img;
+
+            // Size canvas to image, but cap for display
+            const maxW = Math.min(img.naturalWidth || img.width, 700);
+            const scale = maxW / (img.naturalWidth || img.width);
+            canvas.width = Math.round((img.naturalWidth || img.width) * scale);
+            canvas.height = Math.round((img.naturalHeight || img.height) * scale);
+
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            originalData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+            if (autoRemove) {
+                runAutoRemove();
+            }
+        }
+
+        function closeEditor() {
+            overlay.classList.remove('open');
+            bgRemoved = false;
+        }
+
+        $('#photoEditorClose').addEventListener('click', closeEditor);
+        $('#editorCancel').addEventListener('click', closeEditor);
+        overlay.addEventListener('click', e => { if (e.target === overlay) closeEditor(); });
+
+        // Tool selection
+        $$('.editor-tool-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                $$('.editor-tool-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentTool = btn.dataset.tool;
+            });
+        });
+
+        // Brush size
+        $('#brushSize').addEventListener('input', e => {
+            brushSize = parseInt(e.target.value);
+            $('#brushSizeLabel').textContent = brushSize;
+        });
+
+        // Brush softness
+        $('#brushSoftness').addEventListener('input', e => {
+            brushSoftness = parseInt(e.target.value);
+        });
+
+        // Reset
+        $('#editorReset').addEventListener('click', () => {
+            if (!originalData) return;
+            ctx.putImageData(originalData, 0, 0);
+            bgRemoved = false;
+        });
+
+        // Auto remove button inside editor
+        $('#editorAutoRemove').addEventListener('click', () => runAutoRemove());
+
+        // Apply cutout
+        $('#editorApply').addEventListener('click', () => {
+            // Convert canvas to image and update state
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const img = new Image();
+                img.onload = () => {
+                    state.playerPhoto = img;
+                    // Update preview
+                    const preview = $('#playerPhotoPreview');
+                    preview.src = url;
+                    preview.style.display = 'block';
+                    // Show touch-up button
+                    $('#editCutoutBtn').style.display = 'block';
+                    updateCard();
+                    closeEditor();
+                };
+                img.src = url;
+            }, 'image/png');
+        });
+
+        // ===== AUTO BACKGROUND REMOVAL =====
+        async function runAutoRemove() {
+            loading.style.display = 'flex';
+            loadingText.textContent = 'Loading AI model (first time may take 15-30s)...';
+
+            try {
+                const { removeBackground } = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/dist/index.js');
+
+                loadingText.textContent = 'Removing background...';
+
+                // Convert original image to blob
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = originalImage.naturalWidth || originalImage.width;
+                tempCanvas.height = originalImage.naturalHeight || originalImage.height;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(originalImage, 0, 0);
+
+                const inputBlob = await new Promise(resolve => tempCanvas.toBlob(resolve, 'image/png'));
+
+                const resultBlob = await removeBackground(inputBlob, {
+                    progress: (key, current, total) => {
+                        if (key === 'compute:inference') {
+                            loadingText.textContent = 'Processing image...';
+                        }
+                    }
+                });
+
+                // Draw result onto editor canvas
+                const resultImg = new Image();
+                resultImg.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(resultImg, 0, 0, canvas.width, canvas.height);
+                    bgRemoved = true;
+                    loading.style.display = 'none';
+                };
+                resultImg.src = URL.createObjectURL(resultBlob);
+
+            } catch (err) {
+                console.error('Auto background removal failed:', err);
+                loadingText.textContent = 'Auto-removal unavailable. Use the eraser tool instead.';
+                setTimeout(() => { loading.style.display = 'none'; }, 2000);
+            }
+        }
+
+        // ===== MANUAL BRUSH TOOLS =====
+        function getCanvasPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY
+            };
+        }
+
+        function brushAt(x, y) {
+            const r = brushSize;
+            const softEdge = brushSoftness / 100;
+
+            if (currentTool === 'eraser') {
+                if (softEdge > 0) {
+                    // Soft eraser — use radial gradient for feathered edge
+                    const imgData = ctx.getImageData(
+                        Math.max(0, Math.floor(x - r)),
+                        Math.max(0, Math.floor(y - r)),
+                        Math.min(r * 2, canvas.width),
+                        Math.min(r * 2, canvas.height)
+                    );
+                    const cx = x - Math.max(0, Math.floor(x - r));
+                    const cy = y - Math.max(0, Math.floor(y - r));
+                    for (let py = 0; py < imgData.height; py++) {
+                        for (let px = 0; px < imgData.width; px++) {
+                            const dist = Math.sqrt((px - cx) ** 2 + (py - cy) ** 2);
+                            if (dist < r) {
+                                const idx = (py * imgData.width + px) * 4;
+                                const falloff = dist / r;
+                                const hardRadius = r * (1 - softEdge);
+                                if (dist < hardRadius) {
+                                    imgData.data[idx + 3] = 0;
+                                } else {
+                                    const blend = (dist - hardRadius) / (r - hardRadius);
+                                    imgData.data[idx + 3] = Math.round(imgData.data[idx + 3] * blend);
+                                }
+                            }
+                        }
+                    }
+                    ctx.putImageData(imgData, Math.max(0, Math.floor(x - r)), Math.max(0, Math.floor(y - r)));
+                } else {
+                    // Hard eraser — clear circle
+                    ctx.save();
+                    ctx.globalCompositeOperation = 'destination-out';
+                    ctx.beginPath();
+                    ctx.arc(x, y, r, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            } else if (currentTool === 'restore') {
+                // Restore from original data
+                if (!originalData) return;
+                const sx = Math.max(0, Math.floor(x - r));
+                const sy = Math.max(0, Math.floor(y - r));
+                const sw = Math.min(r * 2, canvas.width - sx);
+                const sh = Math.min(r * 2, canvas.height - sy);
+
+                const current = ctx.getImageData(sx, sy, sw, sh);
+                const cx = x - sx;
+                const cy = y - sy;
+
+                for (let py = 0; py < sh; py++) {
+                    for (let px = 0; px < sw; px++) {
+                        const dist = Math.sqrt((px - cx) ** 2 + (py - cy) ** 2);
+                        if (dist < r) {
+                            const idx = (py * sw + px) * 4;
+                            const origIdx = ((sy + py) * originalData.width + (sx + px)) * 4;
+                            current.data[idx] = originalData.data[origIdx];
+                            current.data[idx + 1] = originalData.data[origIdx + 1];
+                            current.data[idx + 2] = originalData.data[origIdx + 2];
+                            current.data[idx + 3] = originalData.data[origIdx + 3];
+                        }
+                    }
+                }
+                ctx.putImageData(current, sx, sy);
+            }
+        }
+
+        // Drawing events — mouse
+        canvas.addEventListener('mousedown', e => {
+            isDrawing = true;
+            const pos = getCanvasPos(e);
+            brushAt(pos.x, pos.y);
+        });
+        canvas.addEventListener('mousemove', e => {
+            if (!isDrawing) return;
+            const pos = getCanvasPos(e);
+            brushAt(pos.x, pos.y);
+        });
+        canvas.addEventListener('mouseup', () => { isDrawing = false; });
+        canvas.addEventListener('mouseleave', () => { isDrawing = false; });
+
+        // Drawing events — touch
+        canvas.addEventListener('touchstart', e => {
+            e.preventDefault();
+            isDrawing = true;
+            const pos = getCanvasPos(e);
+            brushAt(pos.x, pos.y);
+        }, { passive: false });
+        canvas.addEventListener('touchmove', e => {
+            e.preventDefault();
+            if (!isDrawing) return;
+            const pos = getCanvasPos(e);
+            brushAt(pos.x, pos.y);
+        }, { passive: false });
+        canvas.addEventListener('touchend', () => { isDrawing = false; });
+    })();
+
     // ===== FOIL + GLOSS MOUSE EFFECTS =====
     document.addEventListener('mousemove', e => {
         const card = $('#cardFrontInner');
