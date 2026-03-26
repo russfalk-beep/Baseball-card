@@ -433,7 +433,7 @@
                 nameplate.style.background = `linear-gradient(90deg, ${primary}dd, #111, ${secondary}dd)`;
                 break;
         }
-        bgLayer.style.borderRadius = '12px';
+        bgLayer.style.borderRadius = '5px';
 
         // Top bar
         $('#cardTopBar').style.background = `linear-gradient(90deg, ${secondary}dd, ${secondary}44, transparent)`;
