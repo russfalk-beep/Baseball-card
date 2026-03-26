@@ -537,11 +537,20 @@
         const accent = $('#accentColor').value;
 
         $('#cardBackBg').style.background = `#f0efe8`;
+        $('#cardBackBg').style.border = `5px solid ${primary}`;
+        $('#cardBackBg').style.borderRadius = '4px';
         $('#backNumber').textContent = `#${number}`;
         $('#backName').textContent = name;
         $('#backTeam').textContent = team;
         $('#backHeader').style.background = primary;
         $('#backAccentLine').style.background = accent;
+
+        // Stats table header uses team color
+        document.querySelectorAll('.stats-table th').forEach(th => {
+            th.style.background = `${primary}18`;
+            th.style.color = primary;
+            th.style.borderBottomColor = primary;
+        });
 
         // Headshot on back
         const headshot = $('#backHeadshot');
@@ -551,6 +560,9 @@
         } else {
             headshot.style.display = 'none';
         }
+
+        // Info box uses team color border
+        $('.back-info-box').style.borderColor = `${primary}30`;
 
         // Info
         $('#backPosition').textContent = $('#position').value;
@@ -576,6 +588,7 @@
         const bio = $('#bio').value;
         $('#backBio').style.display = bio ? 'block' : 'none';
         $('#backBioText').textContent = bio;
+        $('#backBio').style.borderLeftColor = accent;
 
         // League logo
         const leagueLogoArea = $('#backLeagueLogo');

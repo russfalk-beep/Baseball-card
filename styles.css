@@ -451,7 +451,7 @@ input[type="range"] {
     mix-blend-mode: multiply;
 }
 
-/* Inner photo frame — the colored border inside the white border */
+/* Inner photo frame — thick colored border inside the white border */
 .card-photo-border {
     position: absolute;
     top: 30px;
@@ -459,12 +459,11 @@ input[type="range"] {
     right: 8px;
     bottom: 0;
     z-index: 3;
-    border: 3px solid;
+    border: 5px solid;
     border-color: #c8102e;
     border-bottom: none;
     border-radius: 2px 2px 0 0;
     pointer-events: none;
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
 }
 
 /* Card edge — subtle paper cut edge */
