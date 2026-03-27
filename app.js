@@ -402,21 +402,24 @@
             photoPlaceholder.style.display = 'block';
         }
 
-        // Field background — built-in photo, custom upload, or none
+        // Field background — set directly on the photo area
         const fieldSel = $('#fieldBgSelect').value;
-        const fieldBgDisplay = $('#fieldBgDisplay');
-        const fieldBgEl = $('#fieldBg');
+        const photoArea = $('#cardPhotoArea');
 
         if (fieldSel === 'none') {
-            fieldBgEl.style.display = 'none';
+            photoArea.style.backgroundImage = 'none';
+            photoArea.style.backgroundColor = '#e8e8e8';
         } else if (fieldSel === 'custom' && state.fieldBg) {
-            fieldBgDisplay.src = state.fieldBg.src;
-            fieldBgEl.style.display = 'block';
+            photoArea.style.backgroundImage = `url(${state.fieldBg.src})`;
+            photoArea.style.backgroundSize = 'cover';
+            photoArea.style.backgroundPosition = 'center';
         } else if (builtInFields[fieldSel]) {
-            fieldBgDisplay.src = builtInFields[fieldSel];
-            fieldBgEl.style.display = 'block';
+            photoArea.style.backgroundImage = `url(${builtInFields[fieldSel]})`;
+            photoArea.style.backgroundSize = 'cover';
+            photoArea.style.backgroundPosition = 'center';
         } else {
-            fieldBgEl.style.display = 'block';
+            photoArea.style.backgroundImage = 'none';
+            photoArea.style.backgroundColor = '#e8e8e8';
         }
 
         // Vignette
