@@ -425,7 +425,7 @@ input[type="range"] {
 .baseball-card.front {
     display: flex;
     flex-direction: column;
-    padding: 6px 6px 0 6px;
+    padding: 10px 10px 0 10px;
 }
 
 /* Background layer — this IS the card border, colored with team colors */
@@ -452,9 +452,9 @@ input[type="range"] {
 /* Inner photo frame — colored border inside the team-color border */
 .card-photo-border {
     position: absolute;
-    top: 30px;
-    left: 6px;
-    right: 6px;
+    top: 36px;
+    left: 10px;
+    right: 10px;
     bottom: 0;
     z-index: 3;
     border: 3px solid;
@@ -513,16 +513,17 @@ input[type="range"] {
     transition: opacity 0.3s;
 }
 
-/* Top bar — sits in the white border area */
+/* Top bar — team-colored header strip */
 .card-top-bar {
     position: relative;
     z-index: 5;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 2px 4px;
-    min-height: 22px;
+    padding: 4px 6px;
+    min-height: 28px;
     background: transparent;
+    border-radius: 2px 2px 0 0;
 }
 .brand-logo-display {
     height: 20px;
@@ -539,10 +540,11 @@ input[type="range"] {
 }
 .card-year-display {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 0.75rem;
+    font-size: 0.9rem;
     letter-spacing: 1px;
     font-weight: 700;
     color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 /* Photo area — bright, clean, fills the inner frame */
@@ -611,8 +613,8 @@ input[type="range"] {
 /* Team logo */
 .card-team-logo {
     position: absolute;
-    top: 34px;
-    right: 14px;
+    top: 40px;
+    right: 16px;
     z-index: 10;
     width: 50px;
     height: 50px;
@@ -645,8 +647,8 @@ input[type="range"] {
 /* Position badge — clean circle like real Topps */
 .position-badge {
     position: absolute;
-    top: 34px;
-    left: 14px;
+    top: 40px;
+    left: 16px;
     z-index: 10;
     background: white;
     color: #111;
@@ -687,7 +689,7 @@ input[type="range"] {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    margin: 0 -6px;
+    margin: 0 -10px;
     border-radius: 0 0 4px 4px;
 }
 .player-name-display {
