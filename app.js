@@ -686,22 +686,12 @@
     }
 
     function drawCropMarks(pdf, x, y, w, h) {
-        const len = 0.1;
-        const gap = 0.125;
-        pdf.setDrawColor(153);
-        pdf.setLineWidth(0.01);
-        // Top-left
-        pdf.line(x - gap - len, y, x - gap, y);
-        pdf.line(x, y - gap - len, x, y - gap);
-        // Top-right
-        pdf.line(x + w + gap, y, x + w + gap + len, y);
-        pdf.line(x + w, y - gap - len, x + w, y - gap);
-        // Bottom-left
-        pdf.line(x - gap - len, y + h, x - gap, y + h);
-        pdf.line(x, y + h + gap, x, y + h + gap + len);
-        // Bottom-right
-        pdf.line(x + w + gap, y + h, x + w + gap + len, y + h);
-        pdf.line(x + w, y + h + gap, x + w, y + h + gap + len);
+        // Draw a full cut-line rectangle around the card
+        pdf.setDrawColor(180);
+        pdf.setLineWidth(0.005);
+        pdf.setLineDashPattern([0.05, 0.05], 0);
+        pdf.rect(x, y, w, h);
+        pdf.setLineDashPattern([], 0);
     }
 
     function buildPrintPages(cardCount, doubleSided, showCropMarks) {
@@ -742,17 +732,8 @@
 
         function makeCropMarks(show) {
             if (!show) return '';
-            const markStyle = 'position:absolute;background:#999;-webkit-print-color-adjust:exact;print-color-adjust:exact;';
-            return `
-                <div style="${markStyle}top:0;left:0.125in;width:0.1in;height:0.5pt;"></div>
-                <div style="${markStyle}top:0.125in;left:0;width:0.5pt;height:0.1in;"></div>
-                <div style="${markStyle}top:0;right:0.125in;width:0.1in;height:0.5pt;"></div>
-                <div style="${markStyle}top:0.125in;right:0;width:0.5pt;height:0.1in;"></div>
-                <div style="${markStyle}bottom:0;left:0.125in;width:0.1in;height:0.5pt;"></div>
-                <div style="${markStyle}bottom:0.125in;left:0;width:0.5pt;height:0.1in;"></div>
-                <div style="${markStyle}bottom:0;right:0.125in;width:0.1in;height:0.5pt;"></div>
-                <div style="${markStyle}bottom:0.125in;right:0;width:0.5pt;height:0.1in;"></div>
-            `;
+            // Full dashed cut-line rectangle around the card wrapper
+            return `<div style="position:absolute;inset:0.125in;border:0.5pt dashed #aaa;pointer-events:none;-webkit-print-color-adjust:exact;print-color-adjust:exact;"></div>`;
         }
 
         function wrapCard(cardEl) {
