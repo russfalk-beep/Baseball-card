@@ -617,6 +617,8 @@
                 const node = el.querySelector(sel);
                 if (node) node.remove();
             });
+            // Force exact screen dimensions on the card
+            el.style.cssText += 'width:350px !important;height:490px !important;';
             return el;
         };
         const backClone = () => {
@@ -626,38 +628,52 @@
                 const node = el.querySelector(sel);
                 if (node) node.remove();
             });
+            el.style.cssText += 'width:350px !important;height:490px !important;';
             return el;
         };
 
-        function makeCropMarks() {
+        function makeCropMarks(show) {
+            if (!show) return '';
+            const markStyle = 'position:absolute;background:#999;-webkit-print-color-adjust:exact;print-color-adjust:exact;';
             return `
-                <div class="crop-mark top-left-h"></div>
-                <div class="crop-mark top-left-v"></div>
-                <div class="crop-mark top-right-h"></div>
-                <div class="crop-mark top-right-v"></div>
-                <div class="crop-mark bottom-left-h"></div>
-                <div class="crop-mark bottom-left-v"></div>
-                <div class="crop-mark bottom-right-h"></div>
-                <div class="crop-mark bottom-right-v"></div>
+                <div style="${markStyle}top:0;left:0.125in;width:0.1in;height:0.5pt;"></div>
+                <div style="${markStyle}top:0.125in;left:0;width:0.5pt;height:0.1in;"></div>
+                <div style="${markStyle}top:0;right:0.125in;width:0.1in;height:0.5pt;"></div>
+                <div style="${markStyle}top:0.125in;right:0;width:0.5pt;height:0.1in;"></div>
+                <div style="${markStyle}bottom:0;left:0.125in;width:0.1in;height:0.5pt;"></div>
+                <div style="${markStyle}bottom:0.125in;left:0;width:0.5pt;height:0.1in;"></div>
+                <div style="${markStyle}bottom:0;right:0.125in;width:0.1in;height:0.5pt;"></div>
+                <div style="${markStyle}bottom:0.125in;right:0;width:0.5pt;height:0.1in;"></div>
             `;
         }
 
         function wrapCard(cardEl) {
             const wrapper = document.createElement('div');
-            wrapper.className = `print-card-wrapper ${cropClass}`;
-            wrapper.innerHTML = makeCropMarks();
+            wrapper.style.cssText = 'width:2.75in;height:3.75in;position:relative;display:flex;align-items:center;justify-content:center;';
+            wrapper.innerHTML = makeCropMarks(showCropMarks);
+
+            // Card container — holds the scaled-down card
             const cardDiv = document.createElement('div');
-            cardDiv.className = 'print-card';
-            cardDiv.appendChild(cardEl);
+            cardDiv.style.cssText = 'width:2.5in;height:3.5in;overflow:hidden;border-radius:3px;position:relative;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;';
+
+            // Inner container at screen size, scaled down
+            const scaleWrap = document.createElement('div');
+            scaleWrap.style.cssText = 'width:350px;height:490px;transform:scale(0.6857);transform-origin:top left;filter:none;';
+            scaleWrap.appendChild(cardEl);
+
+            cardDiv.appendChild(scaleWrap);
             wrapper.appendChild(cardDiv);
             return wrapper;
         }
 
+        const pageStyle = 'width:8.5in;height:11in;position:relative;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:0;background:white;page-break-after:always;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;box-sizing:border-box;padding:0;';
+        const labelStyle = 'position:absolute;top:0.15in;left:50%;transform:translateX(-50%);font-size:8pt;color:#999;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:3px;';
+
         // === PAGE 1: FRONTS ===
         const frontPage = document.createElement('div');
-        frontPage.className = 'print-page';
+        frontPage.style.cssText = pageStyle;
         const frontLabel = document.createElement('div');
-        frontLabel.className = 'print-page-label';
+        frontLabel.style.cssText = labelStyle;
         frontLabel.textContent = doubleSided ? 'FRONT SIDE' : 'FRONT';
         frontPage.appendChild(frontLabel);
 
@@ -669,9 +685,9 @@
         // === PAGE 2: BACKS (if double-sided) ===
         if (doubleSided) {
             const backPage = document.createElement('div');
-            backPage.className = 'print-page';
+            backPage.style.cssText = pageStyle + 'page-break-after:auto;';
             const backLabel = document.createElement('div');
-            backLabel.className = 'print-page-label';
+            backLabel.style.cssText = labelStyle;
             backLabel.textContent = 'BACK SIDE';
             backPage.appendChild(backLabel);
 

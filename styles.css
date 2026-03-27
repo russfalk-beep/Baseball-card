@@ -1507,106 +1507,12 @@ input[type="range"] {
     display: none;
 }
 
-/* ===== PRINT LAYOUT (always applied, not just @media print) ===== */
+/* ===== PRINT LAYOUT ===== */
 .print-area {
     display: none;
 }
 
-.print-page {
-    width: 8.5in;
-    height: 11in;
-    position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    align-content: center;
-    justify-content: center;
-    gap: 0;
-    background: white;
-    page-break-after: always;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    color-adjust: exact !important;
-    box-sizing: border-box;
-    padding: 0;
-}
-.print-page:last-child {
-    page-break-after: auto;
-}
-
-.print-page-label {
-    position: absolute;
-    top: 0.15in;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 8pt;
-    color: #999;
-    font-family: Arial, sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-}
-
-.print-card-wrapper {
-    width: 2.75in;
-    height: 3.75in;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Print card — render at original screen size then scale down to 2.5x3.5in */
-.print-card {
-    width: 2.5in;
-    height: 3.5in;
-    overflow: hidden;
-    border-radius: 3px;
-    position: relative;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    color-adjust: exact !important;
-}
-.print-card .card-container {
-    width: 350px;
-    height: 490px;
-    filter: none !important;
-    transform: scale(0.6857);
-    transform-origin: top left;
-}
-.print-card .baseball-card {
-    width: 350px;
-    height: 490px;
-}
-
-/* Crop marks */
-.crop-mark {
-    position: absolute;
-    background: #999;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-}
-.crop-mark.top-left-h { top: 0; left: 0.125in; width: 0.1in; height: 0.5pt; }
-.crop-mark.top-left-v { top: 0.125in; left: 0; width: 0.5pt; height: 0.1in; }
-.crop-mark.top-right-h { top: 0; right: 0.125in; width: 0.1in; height: 0.5pt; }
-.crop-mark.top-right-v { top: 0.125in; right: 0; width: 0.5pt; height: 0.1in; }
-.crop-mark.bottom-left-h { bottom: 0; left: 0.125in; width: 0.1in; height: 0.5pt; }
-.crop-mark.bottom-left-v { bottom: 0.125in; left: 0; width: 0.5pt; height: 0.1in; }
-.crop-mark.bottom-right-h { bottom: 0; right: 0.125in; width: 0.1in; height: 0.5pt; }
-.crop-mark.bottom-right-v { bottom: 0.125in; right: 0; width: 0.5pt; height: 0.1in; }
-
-.no-crop .crop-mark { display: none; }
-
-.print-flip-note {
-    position: absolute;
-    bottom: 0.2in;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 7pt;
-    color: #bbb;
-    font-family: Arial, sans-serif;
-    white-space: nowrap;
-}
-
-/* ===== PRINT MEDIA QUERY (only for hiding screen / showing print area) ===== */
+/* ===== PRINT MEDIA QUERY ===== */
 @media print {
     body > *:not(.print-area) { display: none !important; visibility: hidden !important; }
     .print-modal-overlay { display: none !important; }
