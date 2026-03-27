@@ -2,7 +2,7 @@
 (function () {
     'use strict';
 
-    const state = { playerPhoto: null, teamLogo: null, brandLogo: null, leagueLogo: null, showFront: true, isPitcher: false };
+    const state = { playerPhoto: null, teamLogo: null, brandLogo: null, leagueLogo: null, fieldBg: null, showFront: true, isPitcher: false };
     const $ = (sel) => document.querySelector(sel);
     const $$ = (sel) => document.querySelectorAll(sel);
 
@@ -43,12 +43,14 @@
         setupUpload('teamLogo', 'teamLogoUpload', 'teamLogoPreview', 'teamLogoPlaceholder', 'teamLogoControls', img => { state.teamLogo = img; updateCard(); });
         setupUpload('brandLogo', 'brandLogoUpload', 'brandLogoPreview', 'brandLogoPlaceholder', 'brandLogoControls', img => { state.brandLogo = img; updateCard(); });
         setupUpload('leagueLogo', 'leagueLogoUpload', 'leagueLogoPreview', 'leagueLogoPlaceholder', 'leagueLogoControls', img => { state.leagueLogo = img; updateCard(); });
+        setupUpload('fieldBgInput', 'fieldBgUpload', 'fieldBgPreview', 'fieldBgPlaceholder', 'fieldBgControls', img => { state.fieldBg = img; updateCard(); });
 
         const removeButtons = {
             playerPhoto: 'removePlayerPhoto',
             teamLogo: 'removeTeamLogo',
             brandLogo: 'removeBrandLogo',
-            leagueLogo: 'removeLeagueLogo'
+            leagueLogo: 'removeLeagueLogo',
+            fieldBg: 'removeFieldBg'
         };
         const removeHandler = (key, previewId, placeholderId, controlsId, boxId, inputId) => {
             $(`#${removeButtons[key]}`).addEventListener('click', () => {
@@ -65,6 +67,7 @@
         removeHandler('teamLogo', 'teamLogoPreview', 'teamLogoPlaceholder', 'teamLogoControls', 'teamLogoUpload', 'teamLogo');
         removeHandler('brandLogo', 'brandLogoPreview', 'brandLogoPlaceholder', 'brandLogoControls', 'brandLogoUpload', 'brandLogo');
         removeHandler('leagueLogo', 'leagueLogoPreview', 'leagueLogoPlaceholder', 'leagueLogoControls', 'leagueLogoUpload', 'leagueLogo');
+        removeHandler('fieldBg', 'fieldBgPreview', 'fieldBgPlaceholder', 'fieldBgControls', 'fieldBgUpload', 'fieldBgInput');
     }
 
     function setupUpload(inputId, boxId, previewId, placeholderId, controlsId, callback) {
@@ -501,8 +504,18 @@
             photoPlaceholder.style.display = 'block';
         }
 
-        // Field bg
-        $('#fieldBg').style.display = $('#showOnField').checked ? 'block' : 'none';
+        // Field bg — uploaded photo takes priority over canvas
+        const fieldBgDisplay = $('#fieldBgDisplay');
+        if (state.fieldBg) {
+            fieldBgDisplay.src = state.fieldBg.src;
+            fieldBgDisplay.style.display = 'block';
+            $('#fieldCanvas').style.display = 'none';
+            $('#fieldBg').style.display = 'block';
+        } else {
+            fieldBgDisplay.style.display = 'none';
+            $('#fieldCanvas').style.display = 'block';
+            $('#fieldBg').style.display = 'block';
+        }
 
         // Vignette
         const vig = parseInt(vignetteStrength);
