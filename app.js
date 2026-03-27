@@ -292,133 +292,6 @@
         backContainer.addEventListener('mouseleave', () => { backContainer.style.transform = ''; });
     }
 
-    // ===== FIELD BACKGROUND =====
-    function drawFieldBackground() {
-        const canvas = $('#fieldCanvas'), ctx = canvas.getContext('2d'), w = canvas.width, h = canvas.height;
-
-        // Clear blue daytime sky
-        const sky = ctx.createLinearGradient(0, 0, 0, h * 0.45);
-        sky.addColorStop(0, '#4a90d9');
-        sky.addColorStop(0.5, '#6ab0f0');
-        sky.addColorStop(1, '#a8d4f5');
-        ctx.fillStyle = sky;
-        ctx.fillRect(0, 0, w, h * 0.45);
-
-        // A few simple clouds
-        ctx.fillStyle = 'rgba(255,255,255,0.6)';
-        ctx.beginPath(); ctx.ellipse(w * 0.2, h * 0.12, 50, 18, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(w * 0.25, h * 0.11, 35, 14, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(w * 0.7, h * 0.18, 45, 15, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(w * 0.74, h * 0.17, 30, 12, 0, 0, Math.PI * 2); ctx.fill();
-
-        // Tree line / fence in distance
-        ctx.fillStyle = '#2d7a3a';
-        ctx.fillRect(0, h * 0.32, w, h * 0.1);
-        // Slight variation in tree line
-        for (let i = 0; i < w; i += 12) {
-            const th = 8 + Math.random() * 14;
-            ctx.fillStyle = `rgb(${35 + Math.random()*20}, ${100 + Math.random()*40}, ${45 + Math.random()*20})`;
-            ctx.beginPath();
-            ctx.ellipse(i + 6, h * 0.33, 8, th, 0, 0, Math.PI * 2);
-            ctx.fill();
-        }
-
-        // Outfield fence
-        ctx.fillStyle = '#2a5a2a';
-        ctx.fillRect(0, h * 0.38, w, 6);
-
-        // Outfield grass
-        const grass = ctx.createLinearGradient(0, h * 0.38, 0, h);
-        grass.addColorStop(0, '#3aaa45');
-        grass.addColorStop(0.3, '#35a040');
-        grass.addColorStop(0.6, '#309838');
-        grass.addColorStop(1, '#2c8e34');
-        ctx.fillStyle = grass;
-        ctx.fillRect(0, h * 0.38, w, h * 0.62);
-
-        // Mowing stripes
-        for (let i = -w; i < w * 2; i += 28) {
-            ctx.fillStyle = i % 56 === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
-            ctx.save();
-            ctx.beginPath();
-            ctx.moveTo(i, h * 0.38);
-            ctx.lineTo(i + 14, h * 0.38);
-            ctx.lineTo(i + 14 + h * 0.3, h);
-            ctx.lineTo(i + h * 0.3, h);
-            ctx.closePath();
-            ctx.fill();
-            ctx.restore();
-        }
-
-        // Infield dirt
-        ctx.fillStyle = '#c49464';
-        ctx.beginPath();
-        ctx.ellipse(w / 2, h * 0.95, w * 0.44, h * 0.34, 0, Math.PI, 0);
-        ctx.fill();
-
-        // Infield grass (darker green circle)
-        ctx.fillStyle = '#2da83c';
-        ctx.beginPath();
-        ctx.ellipse(w / 2, h * 0.95, w * 0.3, h * 0.22, 0, Math.PI, 0);
-        ctx.fill();
-
-        // Diamond bases
-        const d = {
-            home:   { x: w / 2,     y: h * 0.88 },
-            first:  { x: w * 0.7,   y: h * 0.72 },
-            second: { x: w / 2,     y: h * 0.58 },
-            third:  { x: w * 0.3,   y: h * 0.72 }
-        };
-
-        // Base path dirt
-        ctx.strokeStyle = '#c49464';
-        ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.moveTo(d.home.x, d.home.y);
-        ctx.lineTo(d.first.x, d.first.y);
-        ctx.lineTo(d.second.x, d.second.y);
-        ctx.lineTo(d.third.x, d.third.y);
-        ctx.closePath();
-        ctx.stroke();
-
-        // Foul lines (white chalk)
-        ctx.strokeStyle = 'rgba(255,255,255,0.7)';
-        ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(d.home.x, d.home.y); ctx.lineTo(0, h * 0.15); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(d.home.x, d.home.y); ctx.lineTo(w, h * 0.15); ctx.stroke();
-
-        // Bases (white squares)
-        ctx.fillStyle = '#fff';
-        [d.first, d.second, d.third].forEach(b => {
-            ctx.save();
-            ctx.translate(b.x, b.y);
-            ctx.rotate(Math.PI / 4);
-            ctx.fillRect(-5, -5, 10, 10);
-            ctx.restore();
-        });
-
-        // Home plate
-        ctx.fillStyle = '#fff';
-        const hx = d.home.x, hy = d.home.y;
-        ctx.beginPath();
-        ctx.moveTo(hx - 6, hy);
-        ctx.lineTo(hx - 6, hy + 4);
-        ctx.lineTo(hx, hy + 8);
-        ctx.lineTo(hx + 6, hy + 4);
-        ctx.lineTo(hx + 6, hy);
-        ctx.closePath();
-        ctx.fill();
-
-        // Pitcher's mound
-        ctx.fillStyle = '#c49464';
-        ctx.beginPath(); ctx.ellipse(w / 2, h * 0.67, 18, 12, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#d4aa78';
-        ctx.beginPath(); ctx.ellipse(w / 2, h * 0.67, 12, 7, 0, 0, Math.PI * 2); ctx.fill();
-        // Rubber
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(w / 2 - 6, h * 0.67 - 1.5, 12, 3);
-    }
-
     // ===== UPDATE CARD =====
     function updateCard() { recalcStats(); updateFront(); updateBack(); }
 
@@ -528,33 +401,20 @@
             photoPlaceholder.style.display = 'block';
         }
 
-        // Field background — built-in photo, canvas, custom upload, or none
+        // Field background — built-in photo, custom upload, or none
         const fieldSel = $('#fieldBgSelect').value;
         const fieldBgDisplay = $('#fieldBgDisplay');
-        const fieldCanvas = $('#fieldCanvas');
         const fieldBgEl = $('#fieldBg');
 
         if (fieldSel === 'none') {
             fieldBgEl.style.display = 'none';
         } else if (fieldSel === 'custom' && state.fieldBg) {
             fieldBgDisplay.src = state.fieldBg.src;
-            fieldBgDisplay.style.display = 'block';
-            fieldCanvas.style.display = 'none';
             fieldBgEl.style.display = 'block';
         } else if (builtInFields[fieldSel]) {
-            // Use path directly — no cache dependency
             fieldBgDisplay.src = builtInFields[fieldSel];
-            fieldBgDisplay.style.display = 'block';
-            fieldCanvas.style.display = 'none';
-            fieldBgEl.style.display = 'block';
-        } else if (fieldSel === 'canvas') {
-            fieldBgDisplay.style.display = 'none';
-            fieldCanvas.style.display = 'block';
             fieldBgEl.style.display = 'block';
         } else {
-            // Fallback
-            fieldBgDisplay.style.display = 'none';
-            fieldCanvas.style.display = 'block';
             fieldBgEl.style.display = 'block';
         }
 
