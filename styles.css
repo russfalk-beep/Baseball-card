@@ -969,7 +969,6 @@ input[type="range"] {
     position: relative;
     z-index: 2;
     margin: 6px 12px;
-    flex: 1;
 }
 .stats-table {
     width: 100%;
