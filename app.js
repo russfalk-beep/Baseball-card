@@ -609,22 +609,52 @@
 
         const cropClass = showCropMarks ? '' : 'no-crop';
 
-        // Clone front and back card
+        // Clone front and back card — strip effects and fix layout for print
         const frontClone = () => {
             const el = $('#cardFrontInner').cloneNode(true);
             el.removeAttribute('id');
-            // Remove interactive effects for print
-            const gloss = el.querySelector('.card-gloss');
-            const foil = el.querySelector('.card-foil-layer');
-            const rainbow = el.querySelector('.card-rainbow-layer');
-            if (gloss) gloss.style.display = 'none';
-            if (foil) foil.style.opacity = '0';
-            if (rainbow) rainbow.style.opacity = '0';
+            // Remove interactive/screen-only effects
+            ['.card-gloss', '.card-foil-layer', '.card-rainbow-layer', '.card-photo-fade', '.photo-vignette', '.card-texture', '.card-edge'].forEach(sel => {
+                const node = el.querySelector(sel);
+                if (node) node.remove();
+            });
+            // Fix front padding for print scale
+            el.style.padding = '6px 6px 0 6px';
+            // Fix nameplate margin to match
+            const nameplate = el.querySelector('.card-nameplate');
+            if (nameplate) nameplate.style.margin = '0 -6px';
+            // Fix photo border position
+            const photoBorder = el.querySelector('.card-photo-border');
+            if (photoBorder) {
+                photoBorder.style.top = '22px';
+                photoBorder.style.left = '6px';
+                photoBorder.style.right = '6px';
+                photoBorder.style.borderWidth = '2px';
+            }
             return el;
         };
         const backClone = () => {
             const el = $('#cardBackInner').cloneNode(true);
             el.removeAttribute('id');
+            // Remove textures/effects
+            ['.card-back-texture', '.card-back-edge'].forEach(sel => {
+                const node = el.querySelector(sel);
+                if (node) node.remove();
+            });
+            // Fix stats table not stretching
+            const statsTable = el.querySelector('.back-stats-table');
+            if (statsTable) statsTable.style.flex = '0';
+            // Make footer visible
+            const footer = el.querySelector('.back-footer');
+            if (footer) {
+                footer.style.fontSize = '0.28rem';
+                footer.style.color = '#999';
+            }
+            const copyright = el.querySelector('.back-copyright');
+            if (copyright) {
+                copyright.style.fontSize = '0.25rem';
+                copyright.style.color = '#999';
+            }
             return el;
         };
 
