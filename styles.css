@@ -1529,9 +1529,7 @@ input[type="range"] {
     .print-area {
         display: block !important;
         visibility: visible !important;
-        position: absolute;
-        top: 0;
-        left: 0;
+        position: static;
         width: 100%;
         background: white !important;
     }
@@ -1541,7 +1539,7 @@ input[type="range"] {
 
     @page {
         size: letter;
-        margin: 0.5in;
+        margin: 0;
     }
 }
 
