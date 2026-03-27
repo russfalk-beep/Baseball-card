@@ -844,6 +844,10 @@ input[type="range"] {
     display: flex;
     flex-direction: column;
     padding: 0;
+    overflow: hidden;
+}
+.baseball-card.back > * {
+    flex-shrink: 0;
 }
 .card-back-bg {
     position: absolute;
@@ -969,6 +973,9 @@ input[type="range"] {
     position: relative;
     z-index: 2;
     margin: 6px 12px;
+    flex-shrink: 1;
+    min-height: 0;
+    overflow: hidden;
 }
 .stats-table {
     width: 100%;
@@ -1007,6 +1014,9 @@ input[type="range"] {
     background: rgba(0,0,0,0.04);
     border-radius: 4px;
     border-left: 3px solid rgba(0,0,0,0.2);
+    flex-shrink: 1;
+    overflow: hidden;
+    min-height: 0;
 }
 .back-bio p {
     font-size: 0.65rem;
