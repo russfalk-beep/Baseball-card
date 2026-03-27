@@ -568,6 +568,7 @@ input[type="range"] {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: none;
 }
 .field-bg-display {
     position: absolute;

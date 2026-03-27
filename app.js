@@ -16,7 +16,6 @@
         setupFieldFormatting();
         setupAutoCalcStats();
         setupFieldSelect();
-        drawFieldBackground();
         updateCard();
     });
 
