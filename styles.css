@@ -419,23 +419,21 @@ input[type="range"] {
     border-radius: 4px;
     position: relative;
     overflow: hidden;
-    background: white;
 }
 
 /* -- FRONT CARD -- */
 .baseball-card.front {
     display: flex;
     flex-direction: column;
-    padding: 8px 8px 0 8px;
+    padding: 6px 6px 0 6px;
 }
 
-/* Background layer — this IS the card border */
+/* Background layer — this IS the card border, colored with team colors */
 .card-bg-layer {
     position: absolute;
     inset: 0;
     z-index: 0;
     border-radius: 4px;
-    background: white;
 }
 
 /* Cardstock texture — subtle paper grain */
@@ -451,15 +449,15 @@ input[type="range"] {
     mix-blend-mode: multiply;
 }
 
-/* Inner photo frame — thick colored border inside the white border */
+/* Inner photo frame — colored border inside the team-color border */
 .card-photo-border {
     position: absolute;
     top: 30px;
-    left: 8px;
-    right: 8px;
+    left: 6px;
+    right: 6px;
     bottom: 0;
     z-index: 3;
-    border: 5px solid;
+    border: 3px solid;
     border-color: #c8102e;
     border-bottom: none;
     border-radius: 2px 2px 0 0;
@@ -537,14 +535,14 @@ input[type="range"] {
     font-size: 0.6rem;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: #666;
+    color: rgba(255,255,255,0.8);
 }
 .card-year-display {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 0.75rem;
     letter-spacing: 1px;
     font-weight: 700;
-    color: #333;
+    color: white;
 }
 
 /* Photo area — bright, clean, fills the inner frame */
@@ -689,7 +687,7 @@ input[type="range"] {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    margin: 0 -8px;
+    margin: 0 -6px;
     border-radius: 0 0 4px 4px;
 }
 .player-name-display {

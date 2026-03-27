@@ -315,39 +315,39 @@
         const bgLayer = $('#cardBgLayer');
         const nameplate = $('#cardNameplate');
 
-        // Card styles — real printed card: white border, team-colored inner frame & nameplate
+        // Card styles — team-colored border frame & nameplate
         switch (style) {
             case 'classic':
-                bgLayer.style.background = `white`;
+                bgLayer.style.background = primary;
                 bgLayer.style.border = `none`;
                 bgLayer.style.borderImage = 'none';
                 nameplate.style.background = primary;
                 break;
             case 'modern':
-                bgLayer.style.background = `white`;
+                bgLayer.style.background = `linear-gradient(135deg, ${primary}, ${secondary})`;
                 bgLayer.style.border = `none`;
                 nameplate.style.background = `linear-gradient(90deg, ${primary}, ${secondary})`;
                 break;
             case 'vintage':
-                bgLayer.style.background = `#faf6ee`;
+                bgLayer.style.background = `#5c3d2e`;
                 bgLayer.style.border = `none`;
                 nameplate.style.background = `#5c3d2e`;
                 break;
             case 'elite':
-                bgLayer.style.background = `white`;
+                bgLayer.style.background = `linear-gradient(135deg, ${primary}, ${accent}, ${secondary})`;
                 bgLayer.style.border = `none`;
                 nameplate.style.background = `linear-gradient(90deg, ${primary}, ${accent}, ${secondary})`;
                 break;
             case 'rookie':
-                bgLayer.style.background = `white`;
+                bgLayer.style.background = primary;
                 bgLayer.style.border = `none`;
                 nameplate.style.background = primary;
                 break;
         }
         bgLayer.style.borderRadius = '4px';
 
-        // Top bar — clean, sits in white border
-        $('#cardTopBar').style.background = `transparent`;
+        // Top bar — team colored
+        $('#cardTopBar').style.background = primary;
 
         // Name — auto-size with bolder feel
         const nameDisplay = $('#playerNameDisplay');
@@ -402,21 +402,24 @@
             photoPlaceholder.style.display = 'block';
         }
 
-        // Field background — built-in photo, custom upload, or none
+        // Field background — CSS background-image on photo area
         const fieldSel = $('#fieldBgSelect').value;
-        const fieldBgDisplay = $('#fieldBgDisplay');
-        const fieldBgEl = $('#fieldBg');
+        const photoArea = $('#cardPhotoArea');
 
         if (fieldSel === 'none') {
-            fieldBgEl.style.display = 'none';
+            photoArea.style.backgroundImage = 'none';
+            photoArea.style.backgroundColor = '#e8e8e8';
         } else if (fieldSel === 'custom' && state.fieldBg) {
-            fieldBgDisplay.src = state.fieldBg.src;
-            fieldBgEl.style.display = 'block';
+            photoArea.style.backgroundImage = `url(${state.fieldBg.src})`;
+            photoArea.style.backgroundSize = 'cover';
+            photoArea.style.backgroundPosition = 'center';
         } else if (builtInFields[fieldSel]) {
-            fieldBgDisplay.src = builtInFields[fieldSel];
-            fieldBgEl.style.display = 'block';
+            photoArea.style.backgroundImage = `url(${builtInFields[fieldSel]})`;
+            photoArea.style.backgroundSize = 'cover';
+            photoArea.style.backgroundPosition = 'center';
         } else {
-            fieldBgEl.style.display = 'block';
+            photoArea.style.backgroundImage = 'none';
+            photoArea.style.backgroundColor = '#e8e8e8';
         }
 
         // Vignette
@@ -462,7 +465,7 @@
         const accent = $('#accentColor').value;
 
         $('#cardBackBg').style.background = `#f0efe8`;
-        $('#cardBackBg').style.border = `5px solid ${primary}`;
+        $('#cardBackBg').style.border = `6px solid ${primary}`;
         $('#cardBackBg').style.borderRadius = '4px';
         $('#backNumber').textContent = `#${number}`;
         $('#backName').textContent = name;
@@ -470,10 +473,10 @@
         $('#backHeader').style.background = primary;
         $('#backAccentLine').style.background = accent;
 
-        // Stats table header uses team color
+        // Stats table header uses team color — bold and visible
         document.querySelectorAll('.stats-table th').forEach(th => {
-            th.style.background = `${primary}18`;
-            th.style.color = primary;
+            th.style.background = primary;
+            th.style.color = 'white';
             th.style.borderBottomColor = primary;
         });
 
@@ -528,8 +531,11 @@
         const leagueLogoArea = $('#backLeagueLogo');
         if (state.leagueLogo) {
             const logoSize = parseInt($('#leagueLogoSize').value);
-            $('#leagueLogoDisplay').src = state.leagueLogo.src;
-            $('#leagueLogoDisplay').style.height = `${logoSize}px`;
+            const leagueImg = $('#leagueLogoDisplay');
+            leagueImg.src = state.leagueLogo.src;
+            leagueImg.style.height = `${logoSize}px`;
+            leagueImg.style.width = 'auto';
+            leagueImg.style.display = 'block';
             leagueLogoArea.style.display = 'flex';
         } else {
             leagueLogoArea.style.display = 'none';
