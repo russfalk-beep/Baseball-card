@@ -618,26 +618,66 @@
     }
 
     async function generatePDF() {
+        // Check libraries loaded
+        if (typeof html2canvas === 'undefined') {
+            alert('html2canvas library failed to load. Check your internet connection and refresh.');
+            return;
+        }
+        if (!window.jspdf) {
+            alert('jsPDF library failed to load. Check your internet connection and refresh.');
+            return;
+        }
         const { jsPDF } = window.jspdf;
 
-        // Capture front card
         const frontEl = $('#cardFrontInner');
         const backEl = $('#cardBackInner');
 
-        const scale = 3; // high resolution
+        // Use the front card's actual dimensions as the standard for both
+        const captureW = frontEl.offsetWidth;
+        const captureH = frontEl.offsetHeight;
+
+        // Clone card into a fixed-size off-screen container to guarantee identical capture dimensions
+        function makeCaptureable(sourceEl) {
+            const container = document.createElement('div');
+            container.style.cssText = `position:fixed;left:-9999px;top:0;width:${captureW}px;height:${captureH}px;overflow:hidden;z-index:-1;background:transparent;`;
+            const clone = sourceEl.cloneNode(true);
+            clone.removeAttribute('id');
+            clone.style.cssText += `width:${captureW}px !important;height:${captureH}px !important;margin:0 !important;`;
+            // Remove screen-only effects that interfere with capture
+            ['.card-gloss', '.card-foil-layer', '.card-rainbow-layer', '.card-photo-fade', '.photo-vignette', '.card-texture', '.card-edge'].forEach(sel => {
+                const node = clone.querySelector(sel);
+                if (node) node.remove();
+            });
+            container.appendChild(clone);
+            document.body.appendChild(container);
+            return container;
+        }
+
+        const frontContainer = makeCaptureable(frontEl);
+        const backContainer = makeCaptureable(backEl);
+
+        // Small delay for layout to settle
+        await new Promise(r => setTimeout(r, 100));
+
+        const scale = 3;
         const opts = {
-            scale: scale,
+            scale,
             useCORS: true,
             allowTaint: true,
             backgroundColor: null,
-            logging: false
+            logging: false,
+            width: captureW,
+            height: captureH
         };
 
-        const frontCanvas = await html2canvas(frontEl, opts);
-        const backCanvas = await html2canvas(backEl, opts);
+        const frontCanvas = await html2canvas(frontContainer.firstChild, opts);
+        const backCanvas = await html2canvas(backContainer.firstChild, opts);
 
-        // Standard baseball card: 2.5 x 3.5 inches
-        // PDF uses points: 1in = 72pt
+        // Clean up off-screen containers
+        frontContainer.remove();
+        backContainer.remove();
+
+        // Standard baseball card: 2.5 x 3.5 inches, centered on letter
         const cardW = 2.5;
         const cardH = 3.5;
         const pageW = 8.5;
@@ -652,8 +692,6 @@
         pdf.setTextColor(153);
         pdf.text('FRONT SIDE', pageW / 2, 0.35, { align: 'center' });
         pdf.addImage(frontCanvas.toDataURL('image/png'), 'PNG', cardX, cardY, cardW, cardH);
-
-        // Crop marks
         drawCropMarks(pdf, cardX, cardY, cardW, cardH);
 
         // Page 2: Back
@@ -662,8 +700,6 @@
         pdf.setTextColor(153);
         pdf.text('BACK SIDE', pageW / 2, 0.35, { align: 'center' });
         pdf.addImage(backCanvas.toDataURL('image/png'), 'PNG', cardX, cardY, cardW, cardH);
-
-        // Crop marks
         drawCropMarks(pdf, cardX, cardY, cardW, cardH);
 
         // Download
