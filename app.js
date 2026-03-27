@@ -146,8 +146,9 @@
         // Preload built-in field images
         for (const [key, path] of Object.entries(builtInFields)) {
             const img = new Image();
-            img.src = path;
             img.onload = () => { builtInFieldCache[key] = img; updateCard(); };
+            img.onerror = () => { console.warn('Failed to load field:', path); };
+            img.src = path;
         }
     }
 
