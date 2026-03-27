@@ -268,118 +268,127 @@
     function drawFieldBackground() {
         const canvas = $('#fieldCanvas'), ctx = canvas.getContext('2d'), w = canvas.width, h = canvas.height;
 
-        // Sky
+        // Clear blue daytime sky
         const sky = ctx.createLinearGradient(0, 0, 0, h * 0.45);
-        sky.addColorStop(0, '#0c3547'); sky.addColorStop(0.3, '#1a6b8a'); sky.addColorStop(0.7, '#4da6c9'); sky.addColorStop(1, '#87ceeb');
-        ctx.fillStyle = sky; ctx.fillRect(0, 0, w, h * 0.45);
+        sky.addColorStop(0, '#4a90d9');
+        sky.addColorStop(0.5, '#6ab0f0');
+        sky.addColorStop(1, '#a8d4f5');
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, w, h * 0.45);
 
-        // Stadium light glows
-        for (let i = 0; i < 6; i++) {
-            const lx = w * 0.1 + i * w * 0.16;
-            const grad = ctx.createRadialGradient(lx, h * 0.03, 0, lx, h * 0.03, 50);
-            grad.addColorStop(0, 'rgba(255,255,220,0.15)'); grad.addColorStop(1, 'transparent');
-            ctx.fillStyle = grad; ctx.fillRect(lx - 50, 0, 100, 80);
-            // Light pole
-            ctx.strokeStyle = 'rgba(100,100,100,0.2)'; ctx.lineWidth = 1.5;
-            ctx.beginPath(); ctx.moveTo(lx, h * 0.02); ctx.lineTo(lx, h * 0.12); ctx.stroke();
+        // A few simple clouds
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.beginPath(); ctx.ellipse(w * 0.2, h * 0.12, 50, 18, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(w * 0.25, h * 0.11, 35, 14, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(w * 0.7, h * 0.18, 45, 15, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(w * 0.74, h * 0.17, 30, 12, 0, 0, Math.PI * 2); ctx.fill();
+
+        // Tree line / fence in distance
+        ctx.fillStyle = '#2d7a3a';
+        ctx.fillRect(0, h * 0.32, w, h * 0.1);
+        // Slight variation in tree line
+        for (let i = 0; i < w; i += 12) {
+            const th = 8 + Math.random() * 14;
+            ctx.fillStyle = `rgb(${35 + Math.random()*20}, ${100 + Math.random()*40}, ${45 + Math.random()*20})`;
+            ctx.beginPath();
+            ctx.ellipse(i + 6, h * 0.33, 8, th, 0, 0, Math.PI * 2);
+            ctx.fill();
         }
 
-        // Crowd/stands hint
-        const crowd = ctx.createLinearGradient(0, h * 0.08, 0, h * 0.2);
-        crowd.addColorStop(0, 'rgba(40,40,60,0.4)'); crowd.addColorStop(1, 'rgba(40,40,60,0.1)');
-        ctx.fillStyle = crowd; ctx.fillRect(0, h * 0.08, w, h * 0.12);
-        // Crowd dots
-        for (let i = 0; i < 200; i++) {
-            ctx.fillStyle = `rgba(${150+Math.random()*105},${100+Math.random()*100},${80+Math.random()*100},0.15)`;
-            ctx.fillRect(Math.random() * w, h * 0.09 + Math.random() * h * 0.1, 3, 2);
-        }
+        // Outfield fence
+        ctx.fillStyle = '#2a5a2a';
+        ctx.fillRect(0, h * 0.38, w, 6);
 
         // Outfield grass
-        const grass = ctx.createLinearGradient(0, h * 0.35, 0, h);
-        grass.addColorStop(0, '#1a6b2a'); grass.addColorStop(0.3, '#22882e'); grass.addColorStop(0.6, '#2a9d3a'); grass.addColorStop(1, '#1e7a2e');
-        ctx.fillStyle = grass; ctx.fillRect(0, h * 0.35, w, h * 0.65);
+        const grass = ctx.createLinearGradient(0, h * 0.38, 0, h);
+        grass.addColorStop(0, '#3aaa45');
+        grass.addColorStop(0.3, '#35a040');
+        grass.addColorStop(0.6, '#309838');
+        grass.addColorStop(1, '#2c8e34');
+        ctx.fillStyle = grass;
+        ctx.fillRect(0, h * 0.38, w, h * 0.62);
 
-        // Mowing stripes (diagonal)
-        for (let i = -w; i < w * 2; i += 30) {
-            ctx.fillStyle = i % 60 === 0 ? 'rgba(0,20,0,0.04)' : 'rgba(30,255,30,0.02)';
-            ctx.save(); ctx.beginPath();
-            ctx.moveTo(i, h * 0.35); ctx.lineTo(i + 15, h * 0.35); ctx.lineTo(i + 15 + h * 0.3, h); ctx.lineTo(i + h * 0.3, h);
-            ctx.closePath(); ctx.fill(); ctx.restore();
+        // Mowing stripes
+        for (let i = -w; i < w * 2; i += 28) {
+            ctx.fillStyle = i % 56 === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(i, h * 0.38);
+            ctx.lineTo(i + 14, h * 0.38);
+            ctx.lineTo(i + 14 + h * 0.3, h);
+            ctx.lineTo(i + h * 0.3, h);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
         }
 
         // Infield dirt
-        ctx.fillStyle = '#b8855a';
-        ctx.beginPath(); ctx.ellipse(w / 2, h * 0.95, w * 0.45, h * 0.35, 0, Math.PI, 0); ctx.fill();
-        // Dirt detail
-        const dirtGrad = ctx.createRadialGradient(w/2, h*0.75, 10, w/2, h*0.85, w*0.4);
-        dirtGrad.addColorStop(0, 'rgba(160,110,60,0.3)'); dirtGrad.addColorStop(1, 'transparent');
-        ctx.fillStyle = dirtGrad; ctx.beginPath(); ctx.ellipse(w/2, h*0.95, w*0.44, h*0.34, 0, Math.PI, 0); ctx.fill();
+        ctx.fillStyle = '#c49464';
+        ctx.beginPath();
+        ctx.ellipse(w / 2, h * 0.95, w * 0.44, h * 0.34, 0, Math.PI, 0);
+        ctx.fill();
 
-        // Infield grass
-        ctx.fillStyle = '#259a3a';
-        ctx.beginPath(); ctx.ellipse(w / 2, h * 0.95, w * 0.3, h * 0.22, 0, Math.PI, 0); ctx.fill();
+        // Infield grass (darker green circle)
+        ctx.fillStyle = '#2da83c';
+        ctx.beginPath();
+        ctx.ellipse(w / 2, h * 0.95, w * 0.3, h * 0.22, 0, Math.PI, 0);
+        ctx.fill();
 
-        // Diamond
-        const d = { home: {x:w/2,y:h*0.88}, first: {x:w*0.7,y:h*0.72}, second: {x:w/2,y:h*0.58}, third: {x:w*0.3,y:h*0.72} };
+        // Diamond bases
+        const d = {
+            home:   { x: w / 2,     y: h * 0.88 },
+            first:  { x: w * 0.7,   y: h * 0.72 },
+            second: { x: w / 2,     y: h * 0.58 },
+            third:  { x: w * 0.3,   y: h * 0.72 }
+        };
 
-        // Base paths (dirt)
-        ctx.strokeStyle = '#b8855a'; ctx.lineWidth = 6;
-        ctx.beginPath(); ctx.moveTo(d.home.x, d.home.y); ctx.lineTo(d.first.x, d.first.y); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(d.home.x, d.home.y); ctx.lineTo(d.third.x, d.third.y); ctx.stroke();
+        // Base path dirt
+        ctx.strokeStyle = '#c49464';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(d.home.x, d.home.y);
+        ctx.lineTo(d.first.x, d.first.y);
+        ctx.lineTo(d.second.x, d.second.y);
+        ctx.lineTo(d.third.x, d.third.y);
+        ctx.closePath();
+        ctx.stroke();
 
-        // Base path lines (white chalk)
-        ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.moveTo(d.home.x, d.home.y); ctx.lineTo(d.first.x, d.first.y); ctx.lineTo(d.second.x, d.second.y); ctx.lineTo(d.third.x, d.third.y); ctx.closePath(); ctx.stroke();
+        // Foul lines (white chalk)
+        ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(d.home.x, d.home.y); ctx.lineTo(0, h * 0.15); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(d.home.x, d.home.y); ctx.lineTo(w, h * 0.15); ctx.stroke();
 
-        // Bases
-        ctx.fillStyle = '#fff'; ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 4;
-        [d.first, d.second, d.third].forEach(b => { ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(Math.PI/4); ctx.fillRect(-5,-5,10,10); ctx.restore(); });
-        ctx.shadowBlur = 0;
+        // Bases (white squares)
+        ctx.fillStyle = '#fff';
+        [d.first, d.second, d.third].forEach(b => {
+            ctx.save();
+            ctx.translate(b.x, b.y);
+            ctx.rotate(Math.PI / 4);
+            ctx.fillRect(-5, -5, 10, 10);
+            ctx.restore();
+        });
 
         // Home plate
         ctx.fillStyle = '#fff';
-        ctx.beginPath(); const hx = d.home.x, hy = d.home.y;
-        ctx.moveTo(hx-6,hy); ctx.lineTo(hx-6,hy+4); ctx.lineTo(hx,hy+9); ctx.lineTo(hx+6,hy+4); ctx.lineTo(hx+6,hy); ctx.closePath(); ctx.fill();
-
-        // Batter's boxes
-        ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 1;
-        ctx.strokeRect(hx - 22, hy - 8, 14, 22); ctx.strokeRect(hx + 8, hy - 8, 14, 22);
+        const hx = d.home.x, hy = d.home.y;
+        ctx.beginPath();
+        ctx.moveTo(hx - 6, hy);
+        ctx.lineTo(hx - 6, hy + 4);
+        ctx.lineTo(hx, hy + 8);
+        ctx.lineTo(hx + 6, hy + 4);
+        ctx.lineTo(hx + 6, hy);
+        ctx.closePath();
+        ctx.fill();
 
         // Pitcher's mound
-        ctx.fillStyle = '#b8855a';
-        ctx.beginPath(); ctx.ellipse(w/2, h*0.67, 20, 14, 0, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#d4a574';
-        ctx.beginPath(); ctx.ellipse(w/2, h*0.67, 14, 8, 0, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#fff'; ctx.fillRect(w/2-7, h*0.67-2, 14, 4);
-
-        // Foul lines
-        ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.moveTo(d.home.x, d.home.y); ctx.lineTo(0, h*0.2); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(d.home.x, d.home.y); ctx.lineTo(w, h*0.2); ctx.stroke();
-
-        // Warning track
-        ctx.strokeStyle = '#a0744a'; ctx.lineWidth = 10;
-        ctx.beginPath(); ctx.arc(w/2, h*1.2, w*0.75, Math.PI*1.12, Math.PI*1.88); ctx.stroke();
-
-        // Outfield wall
-        ctx.strokeStyle = '#0a4020'; ctx.lineWidth = 8;
-        ctx.beginPath(); ctx.arc(w/2, h*1.2, w*0.79, Math.PI*1.12, Math.PI*1.88); ctx.stroke();
-        // Wall padding (green)
-        ctx.strokeStyle = '#0d5a2a'; ctx.lineWidth = 4;
-        ctx.beginPath(); ctx.arc(w/2, h*1.2, w*0.79, Math.PI*1.12, Math.PI*1.88); ctx.stroke();
-
-        // Atmospheric depth
-        const fog = ctx.createLinearGradient(0, 0, 0, h * 0.35);
-        fog.addColorStop(0, 'rgba(10,30,50,0.35)'); fog.addColorStop(1, 'transparent');
-        ctx.fillStyle = fog; ctx.fillRect(0, 0, w, h * 0.35);
-
-        // Subtle light rays
-        ctx.save(); ctx.globalAlpha = 0.03;
-        for (let i = 0; i < 8; i++) {
-            ctx.fillStyle = '#fff';
-            ctx.beginPath(); ctx.moveTo(w * 0.5, 0); ctx.lineTo(w * 0.1 * i, h); ctx.lineTo(w * 0.1 * i + 30, h); ctx.closePath(); ctx.fill();
-        }
-        ctx.restore();
+        ctx.fillStyle = '#c49464';
+        ctx.beginPath(); ctx.ellipse(w / 2, h * 0.67, 18, 12, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#d4aa78';
+        ctx.beginPath(); ctx.ellipse(w / 2, h * 0.67, 12, 7, 0, 0, Math.PI * 2); ctx.fill();
+        // Rubber
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(w / 2 - 6, h * 0.67 - 1.5, 12, 3);
     }
 
     // ===== UPDATE CARD =====
