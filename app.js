@@ -16,6 +16,7 @@
         setupFieldFormatting();
         setupAutoCalcStats();
         setupFieldSelect();
+        setupSaveLoad();
         updateCard();
     });
 
@@ -72,6 +73,7 @@
 
     function setupUpload(inputId, boxId, previewId, placeholderId, controlsId, callback) {
         const input = $(`#${inputId}`), box = $(`#${boxId}`), preview = $(`#${previewId}`), placeholder = $(`#${placeholderId}`), controls = $(`#${controlsId}`);
+        input.addEventListener('click', e => e.stopPropagation());
         box.addEventListener('click', () => input.click());
         box.addEventListener('dragover', e => { e.preventDefault(); box.style.borderColor = 'var(--accent)'; });
         box.addEventListener('dragleave', () => { box.style.borderColor = ''; });
@@ -1015,4 +1017,142 @@
                 linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 45%)`;
         }
     });
+
+    // ===== SAVE / LOAD DESIGNS =====
+    function setupSaveLoad() {
+        const STORAGE_KEY = 'baseballCardDesigns';
+
+        function getDesigns() {
+            try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
+        }
+
+        function saveDesigns(designs) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(designs));
+        }
+
+        const formFields = [
+            'playerName','teamName','position','jerseyNumber','cardYear','bats','throws','height','weight','birthdate','hometown',
+            'seriesName','cardNumber','bio','statsYear','league',
+            'stat_G','stat_AB','stat_R','stat_H','stat_2B','stat_3B','stat_HR','stat_RBI','stat_BB','stat_SO','stat_SB','stat_AVG','stat_OBP','stat_SLG','stat_OPS',
+            'stat_W','stat_L','stat_ERA','stat_GP','stat_GS','stat_SV','stat_IP','stat_HA','stat_ER','stat_PBB','stat_K','stat_WHIP',
+            'cardStyle','primaryColor','secondaryColor','accentColor','nameColor',
+            'showGloss','showFoil','showRookieBadge','showAllStar','show3DTilt',
+            'borderThickness','vignetteStrength','fieldBgSelect',
+            'playerPhotoZoom','playerPhotoX','playerPhotoY','playerBrightness','playerContrast','playerSaturation',
+            'teamLogoSize','brandLogoSize','leagueLogoSize',
+            'headshotZoom','headshotX','headshotY'
+        ];
+
+        function collectFormData() {
+            const data = {};
+            formFields.forEach(id => {
+                const el = $(`#${id}`);
+                if (!el) return;
+                if (el.type === 'checkbox') data[id] = el.checked;
+                else data[id] = el.value;
+            });
+            if (state.playerPhoto) data._playerPhoto = state.playerPhoto.src;
+            if (state.teamLogo) data._teamLogo = state.teamLogo.src;
+            if (state.brandLogo) data._brandLogo = state.brandLogo.src;
+            if (state.leagueLogo) data._leagueLogo = state.leagueLogo.src;
+            if (state.fieldBg) data._fieldBg = state.fieldBg.src;
+            data._isPitcher = state.isPitcher;
+            return data;
+        }
+
+        function restoreImage(dataUrl, stateKey, previewId, placeholderId, controlsId, boxId) {
+            if (!dataUrl) return;
+            const img = new Image();
+            img.onload = () => {
+                state[stateKey] = img;
+                const preview = $(`#${previewId}`);
+                const placeholder = $(`#${placeholderId}`);
+                const controls = $(`#${controlsId}`);
+                const box = $(`#${boxId}`);
+                if (preview) { preview.src = dataUrl; preview.style.display = 'block'; }
+                if (placeholder) placeholder.style.display = 'none';
+                if (controls) controls.style.display = 'block';
+                if (box) box.classList.add('has-image');
+                updateCard();
+            };
+            img.src = dataUrl;
+        }
+
+        function loadFormData(data) {
+            formFields.forEach(id => {
+                const el = $(`#${id}`);
+                if (!el || data[id] === undefined) return;
+                if (el.type === 'checkbox') el.checked = data[id];
+                else el.value = data[id];
+            });
+            ['primary','secondary','accent','name'].forEach(c => {
+                const picker = $(`#${c}Color`);
+                const text = $(`#${c}ColorText`);
+                if (picker && text) text.value = picker.value;
+            });
+            if (data._isPitcher !== undefined) {
+                state.isPitcher = data._isPitcher;
+                $$('.stat-toggle-btn').forEach(btn => {
+                    btn.classList.toggle('active', (btn.dataset.type === 'pitching') === state.isPitcher);
+                });
+                $('#battingStats').style.display = state.isPitcher ? 'none' : 'block';
+                $('#pitchingStats').style.display = state.isPitcher ? 'block' : 'none';
+            }
+            restoreImage(data._playerPhoto, 'playerPhoto', 'playerPhotoPreview', 'playerPhotoPlaceholder', 'playerPhotoControls', 'playerPhotoUpload');
+            restoreImage(data._teamLogo, 'teamLogo', 'teamLogoPreview', 'teamLogoPlaceholder', 'teamLogoControls', 'teamLogoUpload');
+            restoreImage(data._brandLogo, 'brandLogo', 'brandLogoPreview', 'brandLogoPlaceholder', 'brandLogoControls', 'brandLogoUpload');
+            restoreImage(data._leagueLogo, 'leagueLogo', 'leagueLogoPreview', 'leagueLogoPlaceholder', 'leagueLogoControls', 'leagueLogoUpload');
+            restoreImage(data._fieldBg, 'fieldBg', 'fieldBgPreview', 'fieldBgPlaceholder', 'fieldBgControls', 'fieldBgUpload');
+            updateCard();
+        }
+
+        function refreshDropdown() {
+            const select = $('#loadDesign');
+            const designs = getDesigns();
+            select.innerHTML = '<option value="">Load Saved Design...</option>';
+            Object.keys(designs).sort().forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = name;
+                select.appendChild(opt);
+            });
+        }
+
+        $('#saveDesign').addEventListener('click', () => {
+            const playerName = $('#playerName').value.trim();
+            const defaultName = playerName || 'My Card';
+            const name = prompt('Design name:', defaultName);
+            if (!name) return;
+            const designs = getDesigns();
+            designs[name] = collectFormData();
+            saveDesigns(designs);
+            refreshDropdown();
+            alert(`Design "${name}" saved!`);
+        });
+
+        $('#loadDesign').addEventListener('change', () => {
+            const name = $('#loadDesign').value;
+            if (!name) return;
+            const designs = getDesigns();
+            if (designs[name]) loadFormData(designs[name]);
+            $('#loadDesign').value = '';
+        });
+
+        $('#deleteDesign').addEventListener('click', () => {
+            const select = $('#loadDesign');
+            const name = select.value;
+            if (!name) {
+                alert('Select a design from the dropdown first, then click Delete.');
+                return;
+            }
+            if (!confirm(`Delete design "${name}"?`)) return;
+            const designs = getDesigns();
+            delete designs[name];
+            saveDesigns(designs);
+            refreshDropdown();
+        });
+
+        refreshDropdown();
+    }
+
 })();

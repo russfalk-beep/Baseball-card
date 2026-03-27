@@ -401,6 +401,40 @@ input[type="range"] {
 .save-btn { background: #2563eb; border-color: #2563eb; }
 .save-btn:hover { background: #3b82f6; }
 
+/* ===== DESIGN SAVE/LOAD ===== */
+.design-save-controls {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.design-btn {
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: 'Roboto Condensed', sans-serif;
+    transition: all 0.2s;
+}
+.design-btn:hover { border-color: var(--accent); background: rgba(233,69,96,0.1); }
+.design-btn.danger { color: #e74c3c; }
+.design-btn.danger:hover { background: rgba(231,76,60,0.15); border-color: #e74c3c; }
+#loadDesign {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-family: 'Roboto Condensed', sans-serif;
+    min-width: 180px;
+    cursor: pointer;
+}
+
 /* ===== BASEBALL CARD ===== */
 .card-preview-area {
     perspective: 1200px;
@@ -1562,18 +1596,22 @@ input[type="range"] {
     }
 
     /* Scale inner elements for print size */
+    .print-card .baseball-card.front { padding: 6px 6px 0 6px !important; }
     .print-card .player-name-display { font-size: 0.9rem !important; }
     .print-card .team-name-display { font-size: 0.45rem !important; }
-    .print-card .position-badge { font-size: 0.5rem !important; padding: 2px 5px !important; }
-    .print-card .jersey-number-display { font-size: 1.1rem !important; }
-    .print-card .card-nameplate { padding: 5px 8px 6px !important; min-height: 36px !important; }
-    .print-card .card-top-bar { min-height: 22px !important; padding: 3px 8px !important; }
+    .print-card .position-badge { font-size: 0.5rem !important; padding: 2px 5px !important; top: 28px !important; left: 10px !important; width: 22px !important; height: 22px !important; }
+    .print-card .jersey-number-display { font-size: 0.8rem !important; bottom: 38px !important; right: 10px !important; }
+    .print-card .card-nameplate { padding: 4px 8px 5px !important; min-height: 30px !important; margin: 0 -6px !important; }
+    .print-card .card-top-bar { min-height: 18px !important; padding: 2px 6px !important; }
     .print-card .card-series { font-size: 0.4rem !important; }
     .print-card .card-year-display { font-size: 0.5rem !important; }
     .print-card .brand-logo-display { height: 14px !important; }
-    .print-card .card-number-front { font-size: 0.35rem !important; }
-    .print-card .rookie-badge { font-size: 0.35rem !important; padding: 2px 5px !important; bottom: 42px !important; }
-    .print-card .allstar-badge { font-size: 0.35rem !important; padding: 2px 5px !important; bottom: 42px !important; }
+    .print-card .card-number-front { font-size: 0.35rem !important; bottom: 2px !important; right: 6px !important; }
+    .print-card .card-photo-fade { height: 25px !important; }
+    .print-card .card-photo-border { top: 22px !important; left: 6px !important; right: 6px !important; border-width: 2px !important; }
+    .print-card .card-team-logo { top: 26px !important; right: 10px !important; width: 35px !important; height: 35px !important; }
+    .print-card .rookie-badge { font-size: 0.35rem !important; padding: 2px 5px !important; bottom: 34px !important; }
+    .print-card .allstar-badge { font-size: 0.35rem !important; padding: 2px 5px !important; bottom: 34px !important; }
 
     /* Back card print scaling */
     .print-card .back-header { padding: 7px 45px 6px 9px !important; }
