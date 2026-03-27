@@ -673,8 +673,18 @@
             return wrapper;
         }
 
-        const pageStyle = 'width:8.5in;height:11in;position:relative;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:0;background:white;page-break-after:always;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;box-sizing:border-box;padding:0;';
+        // Fixed position on page so front and back align exactly when double-sided
+        const cardTop = '3.625in'; // center of 11in page: (11 - 3.75) / 2
+        const cardLeft = '2.875in'; // center of 8.5in page: (8.5 - 2.75) / 2
+        const pageStyle = 'width:8.5in;height:11in;position:relative;background:white;page-break-after:always;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;box-sizing:border-box;padding:0;';
         const labelStyle = 'position:absolute;top:0.15in;left:50%;transform:translateX(-50%);font-size:8pt;color:#999;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:3px;';
+
+        function positionCard(wrapper, index) {
+            if (cardCount === 1) {
+                wrapper.style.cssText += `position:absolute;top:${cardTop};left:${cardLeft};`;
+            }
+            // For multi-card layouts, use grid positioning (future)
+        }
 
         // === PAGE 1: FRONTS ===
         const frontPage = document.createElement('div');
@@ -685,7 +695,9 @@
         frontPage.appendChild(frontLabel);
 
         for (let i = 0; i < cardCount; i++) {
-            frontPage.appendChild(wrapCard(frontClone()));
+            const card = wrapCard(frontClone());
+            positionCard(card, i);
+            frontPage.appendChild(card);
         }
         printArea.appendChild(frontPage);
 
@@ -699,8 +711,9 @@
             backPage.appendChild(backLabel);
 
             if (cardCount === 1) {
-                // Single card — just center the back
-                backPage.appendChild(wrapCard(backClone()));
+                const card = wrapCard(backClone());
+                positionCard(card, 0);
+                backPage.appendChild(card);
             } else {
                 // 4-card layout: mirror order for double-sided alignment
                 // When flipping on long edge, the rows stay the same but
