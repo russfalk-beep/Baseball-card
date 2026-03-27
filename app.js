@@ -609,6 +609,11 @@
 
         const cropClass = showCropMarks ? '' : 'no-crop';
 
+        // Use fixed 350x490 for print (standard card proportions)
+        // Scale factor: 2.5in ≈ 240px at 96dpi, so 240/350 = 0.6857
+        const CARD_W = 350, CARD_H = 490;
+        const SCALE = (2.5 * 96) / CARD_W; // ~0.6857
+
         // Clone front and back card — strip screen-only effects for clean print
         const frontClone = () => {
             const el = $('#cardFrontInner').cloneNode(true);
@@ -617,8 +622,7 @@
                 const node = el.querySelector(sel);
                 if (node) node.remove();
             });
-            // Force exact screen dimensions on the card
-            el.style.cssText += 'width:350px !important;height:490px !important;';
+            el.style.cssText += `width:${CARD_W}px !important;height:${CARD_H}px !important;`;
             return el;
         };
         const backClone = () => {
@@ -628,7 +632,10 @@
                 const node = el.querySelector(sel);
                 if (node) node.remove();
             });
-            el.style.cssText += 'width:350px !important;height:490px !important;';
+            el.style.cssText += `width:${CARD_W}px !important;height:${CARD_H}px !important;`;
+            // Prevent stats table from stretching to fill empty space
+            const statsTable = el.querySelector('.back-stats-table');
+            if (statsTable) statsTable.style.flex = '0 0 auto';
             return el;
         };
 
@@ -658,7 +665,7 @@
 
             // Inner container at screen size, scaled down
             const scaleWrap = document.createElement('div');
-            scaleWrap.style.cssText = 'width:350px;height:490px;transform:scale(0.6857);transform-origin:top left;filter:none;';
+            scaleWrap.style.cssText = `width:${CARD_W}px;height:${CARD_H}px;transform:scale(${SCALE});transform-origin:top left;filter:none;`;
             scaleWrap.appendChild(cardEl);
 
             cardDiv.appendChild(scaleWrap);
