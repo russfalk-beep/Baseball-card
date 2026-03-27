@@ -611,8 +611,11 @@
 
         // Use fixed 350x490 for print (standard card proportions)
         // Scale factor: 2.5in ≈ 240px at 96dpi, so 240/350 = 0.6857
-        const CARD_W = 350, CARD_H = 490;
-        const SCALE = (2.5 * 96) / CARD_W; // ~0.6857
+        // Read actual card size from the live preview (respects mobile vs desktop)
+        const liveCard = $('#cardFront');
+        const CARD_W = liveCard.offsetWidth || 350;
+        const CARD_H = liveCard.offsetHeight || 490;
+        const SCALE = (2.5 * 96) / CARD_W;
 
         // Clone front and back card — strip screen-only effects for clean print
         const frontClone = () => {
