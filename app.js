@@ -656,7 +656,8 @@
 
         function wrapCard(cardEl) {
             const wrapper = document.createElement('div');
-            wrapper.style.cssText = 'width:2.75in;height:3.75in;position:relative;display:flex;align-items:center;justify-content:center;';
+            // Position absolutely on the page for exact front/back alignment
+            wrapper.style.cssText = `width:2.75in;height:3.75in;position:absolute;top:3.625in;left:50%;margin-left:-1.375in;display:flex;align-items:center;justify-content:center;`;
             wrapper.innerHTML = makeCropMarks(showCropMarks);
 
             // Card container — holds the scaled-down card
@@ -673,16 +674,9 @@
             return wrapper;
         }
 
-        // Fixed position on page so front and back align exactly when double-sided
-        const cardTop = '3.625in'; // center of 11in page: (11 - 3.75) / 2
         const pageStyle = 'width:8.5in;height:11in;position:relative;background:white;page-break-after:always;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;box-sizing:border-box;padding:0;';
         const labelStyle = 'position:absolute;top:0.15in;left:50%;transform:translateX(-50%);font-size:8pt;color:#999;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:3px;';
 
-        function positionCard(wrapper, index) {
-            if (cardCount === 1) {
-                wrapper.style.cssText += `position:absolute;top:${cardTop};left:50%;transform:translateX(-50%);`;
-            }
-        }
 
         // === PAGE 1: FRONTS ===
         const frontPage = document.createElement('div');
@@ -693,9 +687,7 @@
         frontPage.appendChild(frontLabel);
 
         for (let i = 0; i < cardCount; i++) {
-            const card = wrapCard(frontClone());
-            positionCard(card, i);
-            frontPage.appendChild(card);
+            frontPage.appendChild(wrapCard(frontClone()));
         }
         printArea.appendChild(frontPage);
 
@@ -709,9 +701,7 @@
             backPage.appendChild(backLabel);
 
             if (cardCount === 1) {
-                const card = wrapCard(backClone());
-                positionCard(card, 0);
-                backPage.appendChild(card);
+                backPage.appendChild(wrapCard(backClone()));
             } else {
                 // 4-card layout: mirror order for double-sided alignment
                 // When flipping on long edge, the rows stay the same but
