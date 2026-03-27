@@ -130,7 +130,8 @@
     // ===== FIELD BACKGROUND SELECT =====
     const builtInFields = {
         'photo-daytime': 'images/field-daytime.jpg',
-        'photo-diamond': 'images/field-sunset.jpg'
+        'photo-diamond': 'images/field-sunset.jpg',
+        'photo-night': 'images/field-night.jpg'
     };
     const builtInFieldCache = {};
 
