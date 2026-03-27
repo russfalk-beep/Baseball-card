@@ -1614,25 +1614,28 @@ input[type="range"] {
     .print-card .allstar-badge { font-size: 0.35rem !important; padding: 2px 5px !important; bottom: 34px !important; }
 
     /* Back card print scaling */
-    .print-card .back-header { padding: 7px 45px 6px 9px !important; }
-    .print-card .back-number { font-size: 0.55rem !important; }
-    .print-card .back-name { font-size: 0.75rem !important; }
-    .print-card .back-team { font-size: 0.4rem !important; }
-    .print-card .back-info-box { margin: 4px 8px !important; padding: 4px 6px !important; }
-    .print-card .info-row { font-size: 0.45rem !important; }
-    .print-card .info-label { font-size: 0.38rem !important; }
-    .print-card .info-value { font-size: 0.45rem !important; }
-    .print-card .back-stats-table { margin: 4px 8px !important; }
-    .print-card .stats-table { font-size: 0.42rem !important; }
-    .print-card .stats-table th { font-size: 0.35rem !important; padding: 2px 1px !important; }
-    .print-card .stats-table td { font-size: 0.42rem !important; padding: 2px 1px !important; }
-    .print-card .back-bio { margin: 3px 8px !important; padding: 4px 6px !important; }
-    .print-card .back-bio p { font-size: 0.4rem !important; }
-    .print-card .back-league-logo { padding: 3px 8px !important; }
-    .print-card .back-league-logo img { height: 32px !important; }
-    .print-card .back-footer { padding: 3px 8px !important; font-size: 0.32rem !important; }
-    .print-card .back-copyright { font-size: 0.28rem !important; }
-    .print-card .back-headshot-area { width: 34px !important; height: 34px !important; top: 6px !important; right: 8px !important; }
+    .print-card .card-back-bg { border-width: 4px !important; }
+    .print-card .back-header { padding: 6px 38px 5px 8px !important; }
+    .print-card .back-accent-line { height: 2px !important; }
+    .print-card .back-number { font-size: 0.5rem !important; }
+    .print-card .back-name { font-size: 0.65rem !important; }
+    .print-card .back-team { font-size: 0.35rem !important; letter-spacing: 2px !important; }
+    .print-card .back-info-box { margin: 3px 8px !important; padding: 3px 6px !important; }
+    .print-card .info-row { font-size: 0.4rem !important; padding: 1px 0 !important; }
+    .print-card .info-label { font-size: 0.35rem !important; }
+    .print-card .info-value { font-size: 0.4rem !important; }
+    .print-card .back-stats-table { margin: 3px 8px !important; flex: 0 !important; }
+    .print-card .back-stats-title { font-size: 0.4rem !important; margin-bottom: 2px !important; }
+    .print-card .stats-table { font-size: 0.38rem !important; }
+    .print-card .stats-table th { font-size: 0.32rem !important; padding: 1px 1px !important; }
+    .print-card .stats-table td { font-size: 0.38rem !important; padding: 1px 1px !important; }
+    .print-card .back-bio { margin: 2px 8px !important; padding: 3px 6px !important; }
+    .print-card .back-bio p { font-size: 0.35rem !important; line-height: 1.3 !important; }
+    .print-card .back-league-logo { padding: 2px 8px !important; }
+    .print-card .back-league-logo img { height: 28px !important; }
+    .print-card .back-footer { padding: 2px 8px !important; font-size: 0.28rem !important; }
+    .print-card .back-copyright { font-size: 0.25rem !important; }
+    .print-card .back-headshot-area { width: 30px !important; height: 30px !important; top: 5px !important; right: 6px !important; border-width: 1px !important; }
 
     /* Remove screen-only effects for clean print */
     .print-card .card-gloss,
