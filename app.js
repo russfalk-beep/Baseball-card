@@ -675,15 +675,13 @@
 
         // Fixed position on page so front and back align exactly when double-sided
         const cardTop = '3.625in'; // center of 11in page: (11 - 3.75) / 2
-        const cardLeft = '2.875in'; // center of 8.5in page: (8.5 - 2.75) / 2
         const pageStyle = 'width:8.5in;height:11in;position:relative;background:white;page-break-after:always;-webkit-print-color-adjust:exact;print-color-adjust:exact;color-adjust:exact;box-sizing:border-box;padding:0;';
         const labelStyle = 'position:absolute;top:0.15in;left:50%;transform:translateX(-50%);font-size:8pt;color:#999;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:3px;';
 
         function positionCard(wrapper, index) {
             if (cardCount === 1) {
-                wrapper.style.cssText += `position:absolute;top:${cardTop};left:${cardLeft};`;
+                wrapper.style.cssText += `position:absolute;top:${cardTop};left:50%;transform:translateX(-50%);`;
             }
-            // For multi-card layouts, use grid positioning (future)
         }
 
         // === PAGE 1: FRONTS ===
