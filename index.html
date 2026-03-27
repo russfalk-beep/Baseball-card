@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Baseball Card Maker Pro</title>
-    <link rel="stylesheet" href="styles.css?v=20260327m">
+    <link rel="stylesheet" href="styles.css?v=20260327n">
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto+Condensed:wght@400;700&family=Anton&family=Bebas+Neue&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -513,6 +515,7 @@
                     <button class="preview-btn" id="showBack">Back</button>
                     <button class="preview-btn print-btn" id="printCard">Print Card</button>
                     <button class="preview-btn save-btn" id="saveCard">Save as Image</button>
+                    <button class="preview-btn" id="savePdf" style="background:#7c3aed;border-color:#7c3aed;">Save PDF</button>
                 </div>
                 <div class="design-save-controls">
                     <button class="design-btn" id="saveDesign">Save Design</button>
@@ -780,6 +783,6 @@
         <!-- Pages inserted dynamically -->
     </div>
 
-    <script src="app.js?v=20260327m"></script>
+    <script src="app.js?v=20260327n"></script>
 </body>
 </html>

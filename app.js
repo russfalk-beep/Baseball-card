@@ -594,13 +594,100 @@
 
         // Save as image (keeps old approach but improved)
         $('#saveCard').addEventListener('click', () => {
-            // Use print dialog with "Save as PDF" instruction
             const doubleSided = true;
             buildPrintPages(1, doubleSided, true);
             setTimeout(() => {
                 window.print();
             }, 150);
         });
+
+        // Save as PDF — generates a proper PDF with exact alignment
+        $('#savePdf').addEventListener('click', async () => {
+            const btn = $('#savePdf');
+            btn.textContent = 'Generating...';
+            btn.disabled = true;
+            try {
+                await generatePDF();
+            } catch (e) {
+                console.error('PDF generation failed:', e);
+                alert('PDF generation failed. Try again.');
+            }
+            btn.textContent = 'Save PDF';
+            btn.disabled = false;
+        });
+    }
+
+    async function generatePDF() {
+        const { jsPDF } = window.jspdf;
+
+        // Capture front card
+        const frontEl = $('#cardFrontInner');
+        const backEl = $('#cardBackInner');
+
+        const scale = 3; // high resolution
+        const opts = {
+            scale: scale,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: null,
+            logging: false
+        };
+
+        const frontCanvas = await html2canvas(frontEl, opts);
+        const backCanvas = await html2canvas(backEl, opts);
+
+        // Standard baseball card: 2.5 x 3.5 inches
+        // PDF uses points: 1in = 72pt
+        const cardW = 2.5;
+        const cardH = 3.5;
+        const pageW = 8.5;
+        const pageH = 11;
+        const cardX = (pageW - cardW) / 2;
+        const cardY = (pageH - cardH) / 2;
+
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'in', format: 'letter' });
+
+        // Page 1: Front
+        pdf.setFontSize(8);
+        pdf.setTextColor(153);
+        pdf.text('FRONT SIDE', pageW / 2, 0.35, { align: 'center' });
+        pdf.addImage(frontCanvas.toDataURL('image/png'), 'PNG', cardX, cardY, cardW, cardH);
+
+        // Crop marks
+        drawCropMarks(pdf, cardX, cardY, cardW, cardH);
+
+        // Page 2: Back
+        pdf.addPage();
+        pdf.setFontSize(8);
+        pdf.setTextColor(153);
+        pdf.text('BACK SIDE', pageW / 2, 0.35, { align: 'center' });
+        pdf.addImage(backCanvas.toDataURL('image/png'), 'PNG', cardX, cardY, cardW, cardH);
+
+        // Crop marks
+        drawCropMarks(pdf, cardX, cardY, cardW, cardH);
+
+        // Download
+        const playerName = $('#playerName').value.trim() || 'card';
+        pdf.save(`${playerName.replace(/\s+/g, '_')}_baseball_card.pdf`);
+    }
+
+    function drawCropMarks(pdf, x, y, w, h) {
+        const len = 0.1;
+        const gap = 0.125;
+        pdf.setDrawColor(153);
+        pdf.setLineWidth(0.01);
+        // Top-left
+        pdf.line(x - gap - len, y, x - gap, y);
+        pdf.line(x, y - gap - len, x, y - gap);
+        // Top-right
+        pdf.line(x + w + gap, y, x + w + gap + len, y);
+        pdf.line(x + w, y - gap - len, x + w, y - gap);
+        // Bottom-left
+        pdf.line(x - gap - len, y + h, x - gap, y + h);
+        pdf.line(x, y + h + gap, x, y + h + gap + len);
+        // Bottom-right
+        pdf.line(x + w + gap, y + h, x + w + gap + len, y + h);
+        pdf.line(x + w, y + h + gap, x + w, y + h + gap + len);
     }
 
     function buildPrintPages(cardCount, doubleSided, showCropMarks) {
