@@ -102,7 +102,8 @@
             'showGloss','showFoil','showRookieBadge','showAllStar','show3DTilt',
             'borderThickness','vignetteStrength','showOnField',
             'playerPhotoZoom','playerPhotoX','playerPhotoY','playerBrightness','playerContrast','playerSaturation',
-            'teamLogoSize','brandLogoSize','leagueLogoSize'
+            'teamLogoSize','brandLogoSize','leagueLogoSize',
+            'headshotZoom','headshotX','headshotY'
         ];
         allInputs.forEach(id => {
             const el = $(`#${id}`);
@@ -561,17 +562,26 @@
             th.style.borderBottomColor = primary;
         });
 
-        // Headshot on back
+        // Headshot on back — with zoom/position controls
         const headshot = $('#backHeadshot');
+        const headshotControls = $('#headshotControls');
         if (state.playerPhoto) {
             headshot.src = state.playerPhoto.src;
             headshot.style.display = 'block';
+            headshotControls.style.display = 'block';
+            const hZoom = parseFloat($('#headshotZoom').value);
+            const hX = parseInt($('#headshotX').value);
+            const hY = parseInt($('#headshotY').value);
+            headshot.style.width = `${hZoom * 100}%`;
+            headshot.style.height = 'auto';
+            headshot.style.transform = `translate(calc(-50% + ${hX}px), calc(-50% + ${hY}px))`;
         } else {
             headshot.style.display = 'none';
+            headshotControls.style.display = 'none';
         }
 
         // Info box uses team color border
-        $('.back-info-box').style.borderColor = `${primary}30`;
+        $('#backInfoBox').style.borderColor = `${primary}30`;
 
         // Info
         $('#backPosition').textContent = $('#position').value;
@@ -874,25 +884,6 @@
         });
 
         // ===== AUTO BACKGROUND REMOVAL (MediaPipe Selfie Segmentation) =====
-        let segmenter = null;
-
-        async function initSegmenter() {
-            if (segmenter) return segmenter;
-            segmenter = new SelfieSegmentation({
-                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`
-            });
-            segmenter.setOptions({ modelSelection: 1 }); // 1 = landscape (better for full-body)
-            return new Promise((resolve, reject) => {
-                segmenter.onResults((results) => {
-                    resolve(results);
-                });
-                // Warm up with a tiny canvas to trigger model load
-                const tiny = document.createElement('canvas');
-                tiny.width = 2; tiny.height = 2;
-                segmenter.send({ image: tiny }).catch(reject);
-            }).then(() => segmenter);
-        }
-
         async function runAutoRemove() {
             loading.style.display = 'flex';
             loadingText.textContent = 'Loading AI model...';
@@ -997,7 +988,6 @@
                             const dist = Math.sqrt((px - cx) ** 2 + (py - cy) ** 2);
                             if (dist < r) {
                                 const idx = (py * imgData.width + px) * 4;
-                                const falloff = dist / r;
                                 const hardRadius = r * (1 - softEdge);
                                 if (dist < hardRadius) {
                                     imgData.data[idx + 3] = 0;
