@@ -15,6 +15,7 @@
         setup3DTilt();
         setupFieldFormatting();
         setupAutoCalcStats();
+        setupFieldSelect();
         drawFieldBackground();
         updateCard();
     });
@@ -103,7 +104,7 @@
             'stat_W','stat_L','stat_ERA','stat_GP','stat_GS','stat_SV','stat_IP','stat_HA','stat_ER','stat_PBB','stat_K','stat_WHIP',
             'cardStyle','primaryColor','secondaryColor','accentColor','nameColor',
             'showGloss','showFoil','showRookieBadge','showAllStar','show3DTilt',
-            'borderThickness','vignetteStrength','showOnField',
+            'borderThickness','vignetteStrength','fieldBgSelect',
             'playerPhotoZoom','playerPhotoX','playerPhotoY','playerBrightness','playerContrast','playerSaturation',
             'teamLogoSize','brandLogoSize','leagueLogoSize',
             'headshotZoom','headshotX','headshotY'
@@ -125,6 +126,29 @@
             $('#accentColorLabel').textContent = btn.dataset.accent.toUpperCase();
             updateCard();
         }));
+    }
+
+    // ===== FIELD BACKGROUND SELECT =====
+    const builtInFields = {
+        'photo-daytime': 'images/field-daytime.jpg',
+        'photo-diamond': 'images/field-sunset.jpg'
+    };
+    const builtInFieldCache = {};
+
+    function setupFieldSelect() {
+        const sel = $('#fieldBgSelect');
+        const uploadBox = $('#fieldBgUpload');
+        sel.addEventListener('change', () => {
+            uploadBox.style.display = sel.value === 'custom' ? 'block' : 'none';
+            updateCard();
+        });
+
+        // Preload built-in field images
+        for (const [key, path] of Object.entries(builtInFields)) {
+            const img = new Image();
+            img.src = path;
+            img.onload = () => { builtInFieldCache[key] = img; updateCard(); };
+        }
     }
 
     // ===== SMART FIELD FORMATTING =====
@@ -504,17 +528,29 @@
             photoPlaceholder.style.display = 'block';
         }
 
-        // Field bg — uploaded photo takes priority over canvas
+        // Field background — built-in photo, canvas, custom upload, or none
+        const fieldSel = $('#fieldBgSelect').value;
         const fieldBgDisplay = $('#fieldBgDisplay');
-        if (state.fieldBg) {
+        const fieldCanvas = $('#fieldCanvas');
+        const fieldBg = $('#fieldBg');
+
+        if (fieldSel === 'none') {
+            fieldBg.style.display = 'none';
+        } else if (fieldSel === 'custom' && state.fieldBg) {
             fieldBgDisplay.src = state.fieldBg.src;
             fieldBgDisplay.style.display = 'block';
-            $('#fieldCanvas').style.display = 'none';
-            $('#fieldBg').style.display = 'block';
+            fieldCanvas.style.display = 'none';
+            fieldBg.style.display = 'block';
+        } else if (builtInFieldCache[fieldSel]) {
+            fieldBgDisplay.src = builtInFieldCache[fieldSel].src;
+            fieldBgDisplay.style.display = 'block';
+            fieldCanvas.style.display = 'none';
+            fieldBg.style.display = 'block';
         } else {
+            // Canvas fallback
             fieldBgDisplay.style.display = 'none';
-            $('#fieldCanvas').style.display = 'block';
-            $('#fieldBg').style.display = 'block';
+            fieldCanvas.style.display = 'block';
+            fieldBg.style.display = 'block';
         }
 
         // Vignette
