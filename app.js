@@ -2,7 +2,7 @@
 (function () {
     'use strict';
 
-    const state = { playerPhoto: null, teamLogo: null, brandLogo: null, leagueLogo: null, showFront: true, isPitcher: false };
+    const state = { playerPhoto: null, teamLogo: null, brandLogo: null, leagueLogo: null, fieldBg: null, showFront: true, isPitcher: false };
     const $ = (sel) => document.querySelector(sel);
     const $$ = (sel) => document.querySelectorAll(sel);
 
@@ -15,6 +15,7 @@
         setup3DTilt();
         setupFieldFormatting();
         setupAutoCalcStats();
+        setupFieldSelect();
         drawFieldBackground();
         updateCard();
     });
@@ -43,12 +44,14 @@
         setupUpload('teamLogo', 'teamLogoUpload', 'teamLogoPreview', 'teamLogoPlaceholder', 'teamLogoControls', img => { state.teamLogo = img; updateCard(); });
         setupUpload('brandLogo', 'brandLogoUpload', 'brandLogoPreview', 'brandLogoPlaceholder', 'brandLogoControls', img => { state.brandLogo = img; updateCard(); });
         setupUpload('leagueLogo', 'leagueLogoUpload', 'leagueLogoPreview', 'leagueLogoPlaceholder', 'leagueLogoControls', img => { state.leagueLogo = img; updateCard(); });
+        setupUpload('fieldBgInput', 'fieldBgUpload', 'fieldBgPreview', 'fieldBgPlaceholder', 'fieldBgControls', img => { state.fieldBg = img; updateCard(); });
 
         const removeButtons = {
             playerPhoto: 'removePlayerPhoto',
             teamLogo: 'removeTeamLogo',
             brandLogo: 'removeBrandLogo',
-            leagueLogo: 'removeLeagueLogo'
+            leagueLogo: 'removeLeagueLogo',
+            fieldBg: 'removeFieldBg'
         };
         const removeHandler = (key, previewId, placeholderId, controlsId, boxId, inputId) => {
             $(`#${removeButtons[key]}`).addEventListener('click', () => {
@@ -65,6 +68,7 @@
         removeHandler('teamLogo', 'teamLogoPreview', 'teamLogoPlaceholder', 'teamLogoControls', 'teamLogoUpload', 'teamLogo');
         removeHandler('brandLogo', 'brandLogoPreview', 'brandLogoPlaceholder', 'brandLogoControls', 'brandLogoUpload', 'brandLogo');
         removeHandler('leagueLogo', 'leagueLogoPreview', 'leagueLogoPlaceholder', 'leagueLogoControls', 'leagueLogoUpload', 'leagueLogo');
+        removeHandler('fieldBg', 'fieldBgPreview', 'fieldBgPlaceholder', 'fieldBgControls', 'fieldBgUpload', 'fieldBgInput');
     }
 
     function setupUpload(inputId, boxId, previewId, placeholderId, controlsId, callback) {
@@ -100,9 +104,10 @@
             'stat_W','stat_L','stat_ERA','stat_GP','stat_GS','stat_SV','stat_IP','stat_HA','stat_ER','stat_PBB','stat_K','stat_WHIP',
             'cardStyle','primaryColor','secondaryColor','accentColor','nameColor',
             'showGloss','showFoil','showRookieBadge','showAllStar','show3DTilt',
-            'borderThickness','vignetteStrength','showOnField',
+            'borderThickness','vignetteStrength','fieldBgSelect',
             'playerPhotoZoom','playerPhotoX','playerPhotoY','playerBrightness','playerContrast','playerSaturation',
-            'teamLogoSize','brandLogoSize','leagueLogoSize'
+            'teamLogoSize','brandLogoSize','leagueLogoSize',
+            'headshotZoom','headshotX','headshotY'
         ];
         allInputs.forEach(id => {
             const el = $(`#${id}`);
@@ -121,6 +126,29 @@
             $('#accentColorLabel').textContent = btn.dataset.accent.toUpperCase();
             updateCard();
         }));
+    }
+
+    // ===== FIELD BACKGROUND SELECT =====
+    const builtInFields = {
+        'photo-daytime': 'images/field-daytime.jpg',
+        'photo-diamond': 'images/field-sunset.jpg'
+    };
+    const builtInFieldCache = {};
+
+    function setupFieldSelect() {
+        const sel = $('#fieldBgSelect');
+        const uploadBox = $('#fieldBgUpload');
+        sel.addEventListener('change', () => {
+            uploadBox.style.display = sel.value === 'custom' ? 'block' : 'none';
+            updateCard();
+        });
+
+        // Preload built-in field images
+        for (const [key, path] of Object.entries(builtInFields)) {
+            const img = new Image();
+            img.src = path;
+            img.onload = () => { builtInFieldCache[key] = img; updateCard(); };
+        }
     }
 
     // ===== SMART FIELD FORMATTING =====
@@ -268,118 +296,127 @@
     function drawFieldBackground() {
         const canvas = $('#fieldCanvas'), ctx = canvas.getContext('2d'), w = canvas.width, h = canvas.height;
 
-        // Sky
+        // Clear blue daytime sky
         const sky = ctx.createLinearGradient(0, 0, 0, h * 0.45);
-        sky.addColorStop(0, '#0c3547'); sky.addColorStop(0.3, '#1a6b8a'); sky.addColorStop(0.7, '#4da6c9'); sky.addColorStop(1, '#87ceeb');
-        ctx.fillStyle = sky; ctx.fillRect(0, 0, w, h * 0.45);
+        sky.addColorStop(0, '#4a90d9');
+        sky.addColorStop(0.5, '#6ab0f0');
+        sky.addColorStop(1, '#a8d4f5');
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, w, h * 0.45);
 
-        // Stadium light glows
-        for (let i = 0; i < 6; i++) {
-            const lx = w * 0.1 + i * w * 0.16;
-            const grad = ctx.createRadialGradient(lx, h * 0.03, 0, lx, h * 0.03, 50);
-            grad.addColorStop(0, 'rgba(255,255,220,0.15)'); grad.addColorStop(1, 'transparent');
-            ctx.fillStyle = grad; ctx.fillRect(lx - 50, 0, 100, 80);
-            // Light pole
-            ctx.strokeStyle = 'rgba(100,100,100,0.2)'; ctx.lineWidth = 1.5;
-            ctx.beginPath(); ctx.moveTo(lx, h * 0.02); ctx.lineTo(lx, h * 0.12); ctx.stroke();
+        // A few simple clouds
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.beginPath(); ctx.ellipse(w * 0.2, h * 0.12, 50, 18, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(w * 0.25, h * 0.11, 35, 14, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(w * 0.7, h * 0.18, 45, 15, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(w * 0.74, h * 0.17, 30, 12, 0, 0, Math.PI * 2); ctx.fill();
+
+        // Tree line / fence in distance
+        ctx.fillStyle = '#2d7a3a';
+        ctx.fillRect(0, h * 0.32, w, h * 0.1);
+        // Slight variation in tree line
+        for (let i = 0; i < w; i += 12) {
+            const th = 8 + Math.random() * 14;
+            ctx.fillStyle = `rgb(${35 + Math.random()*20}, ${100 + Math.random()*40}, ${45 + Math.random()*20})`;
+            ctx.beginPath();
+            ctx.ellipse(i + 6, h * 0.33, 8, th, 0, 0, Math.PI * 2);
+            ctx.fill();
         }
 
-        // Crowd/stands hint
-        const crowd = ctx.createLinearGradient(0, h * 0.08, 0, h * 0.2);
-        crowd.addColorStop(0, 'rgba(40,40,60,0.4)'); crowd.addColorStop(1, 'rgba(40,40,60,0.1)');
-        ctx.fillStyle = crowd; ctx.fillRect(0, h * 0.08, w, h * 0.12);
-        // Crowd dots
-        for (let i = 0; i < 200; i++) {
-            ctx.fillStyle = `rgba(${150+Math.random()*105},${100+Math.random()*100},${80+Math.random()*100},0.15)`;
-            ctx.fillRect(Math.random() * w, h * 0.09 + Math.random() * h * 0.1, 3, 2);
-        }
+        // Outfield fence
+        ctx.fillStyle = '#2a5a2a';
+        ctx.fillRect(0, h * 0.38, w, 6);
 
         // Outfield grass
-        const grass = ctx.createLinearGradient(0, h * 0.35, 0, h);
-        grass.addColorStop(0, '#1a6b2a'); grass.addColorStop(0.3, '#22882e'); grass.addColorStop(0.6, '#2a9d3a'); grass.addColorStop(1, '#1e7a2e');
-        ctx.fillStyle = grass; ctx.fillRect(0, h * 0.35, w, h * 0.65);
+        const grass = ctx.createLinearGradient(0, h * 0.38, 0, h);
+        grass.addColorStop(0, '#3aaa45');
+        grass.addColorStop(0.3, '#35a040');
+        grass.addColorStop(0.6, '#309838');
+        grass.addColorStop(1, '#2c8e34');
+        ctx.fillStyle = grass;
+        ctx.fillRect(0, h * 0.38, w, h * 0.62);
 
-        // Mowing stripes (diagonal)
-        for (let i = -w; i < w * 2; i += 30) {
-            ctx.fillStyle = i % 60 === 0 ? 'rgba(0,20,0,0.04)' : 'rgba(30,255,30,0.02)';
-            ctx.save(); ctx.beginPath();
-            ctx.moveTo(i, h * 0.35); ctx.lineTo(i + 15, h * 0.35); ctx.lineTo(i + 15 + h * 0.3, h); ctx.lineTo(i + h * 0.3, h);
-            ctx.closePath(); ctx.fill(); ctx.restore();
+        // Mowing stripes
+        for (let i = -w; i < w * 2; i += 28) {
+            ctx.fillStyle = i % 56 === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(i, h * 0.38);
+            ctx.lineTo(i + 14, h * 0.38);
+            ctx.lineTo(i + 14 + h * 0.3, h);
+            ctx.lineTo(i + h * 0.3, h);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
         }
 
         // Infield dirt
-        ctx.fillStyle = '#b8855a';
-        ctx.beginPath(); ctx.ellipse(w / 2, h * 0.95, w * 0.45, h * 0.35, 0, Math.PI, 0); ctx.fill();
-        // Dirt detail
-        const dirtGrad = ctx.createRadialGradient(w/2, h*0.75, 10, w/2, h*0.85, w*0.4);
-        dirtGrad.addColorStop(0, 'rgba(160,110,60,0.3)'); dirtGrad.addColorStop(1, 'transparent');
-        ctx.fillStyle = dirtGrad; ctx.beginPath(); ctx.ellipse(w/2, h*0.95, w*0.44, h*0.34, 0, Math.PI, 0); ctx.fill();
+        ctx.fillStyle = '#c49464';
+        ctx.beginPath();
+        ctx.ellipse(w / 2, h * 0.95, w * 0.44, h * 0.34, 0, Math.PI, 0);
+        ctx.fill();
 
-        // Infield grass
-        ctx.fillStyle = '#259a3a';
-        ctx.beginPath(); ctx.ellipse(w / 2, h * 0.95, w * 0.3, h * 0.22, 0, Math.PI, 0); ctx.fill();
+        // Infield grass (darker green circle)
+        ctx.fillStyle = '#2da83c';
+        ctx.beginPath();
+        ctx.ellipse(w / 2, h * 0.95, w * 0.3, h * 0.22, 0, Math.PI, 0);
+        ctx.fill();
 
-        // Diamond
-        const d = { home: {x:w/2,y:h*0.88}, first: {x:w*0.7,y:h*0.72}, second: {x:w/2,y:h*0.58}, third: {x:w*0.3,y:h*0.72} };
+        // Diamond bases
+        const d = {
+            home:   { x: w / 2,     y: h * 0.88 },
+            first:  { x: w * 0.7,   y: h * 0.72 },
+            second: { x: w / 2,     y: h * 0.58 },
+            third:  { x: w * 0.3,   y: h * 0.72 }
+        };
 
-        // Base paths (dirt)
-        ctx.strokeStyle = '#b8855a'; ctx.lineWidth = 6;
-        ctx.beginPath(); ctx.moveTo(d.home.x, d.home.y); ctx.lineTo(d.first.x, d.first.y); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(d.home.x, d.home.y); ctx.lineTo(d.third.x, d.third.y); ctx.stroke();
+        // Base path dirt
+        ctx.strokeStyle = '#c49464';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(d.home.x, d.home.y);
+        ctx.lineTo(d.first.x, d.first.y);
+        ctx.lineTo(d.second.x, d.second.y);
+        ctx.lineTo(d.third.x, d.third.y);
+        ctx.closePath();
+        ctx.stroke();
 
-        // Base path lines (white chalk)
-        ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.moveTo(d.home.x, d.home.y); ctx.lineTo(d.first.x, d.first.y); ctx.lineTo(d.second.x, d.second.y); ctx.lineTo(d.third.x, d.third.y); ctx.closePath(); ctx.stroke();
+        // Foul lines (white chalk)
+        ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(d.home.x, d.home.y); ctx.lineTo(0, h * 0.15); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(d.home.x, d.home.y); ctx.lineTo(w, h * 0.15); ctx.stroke();
 
-        // Bases
-        ctx.fillStyle = '#fff'; ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 4;
-        [d.first, d.second, d.third].forEach(b => { ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(Math.PI/4); ctx.fillRect(-5,-5,10,10); ctx.restore(); });
-        ctx.shadowBlur = 0;
+        // Bases (white squares)
+        ctx.fillStyle = '#fff';
+        [d.first, d.second, d.third].forEach(b => {
+            ctx.save();
+            ctx.translate(b.x, b.y);
+            ctx.rotate(Math.PI / 4);
+            ctx.fillRect(-5, -5, 10, 10);
+            ctx.restore();
+        });
 
         // Home plate
         ctx.fillStyle = '#fff';
-        ctx.beginPath(); const hx = d.home.x, hy = d.home.y;
-        ctx.moveTo(hx-6,hy); ctx.lineTo(hx-6,hy+4); ctx.lineTo(hx,hy+9); ctx.lineTo(hx+6,hy+4); ctx.lineTo(hx+6,hy); ctx.closePath(); ctx.fill();
-
-        // Batter's boxes
-        ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 1;
-        ctx.strokeRect(hx - 22, hy - 8, 14, 22); ctx.strokeRect(hx + 8, hy - 8, 14, 22);
+        const hx = d.home.x, hy = d.home.y;
+        ctx.beginPath();
+        ctx.moveTo(hx - 6, hy);
+        ctx.lineTo(hx - 6, hy + 4);
+        ctx.lineTo(hx, hy + 8);
+        ctx.lineTo(hx + 6, hy + 4);
+        ctx.lineTo(hx + 6, hy);
+        ctx.closePath();
+        ctx.fill();
 
         // Pitcher's mound
-        ctx.fillStyle = '#b8855a';
-        ctx.beginPath(); ctx.ellipse(w/2, h*0.67, 20, 14, 0, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#d4a574';
-        ctx.beginPath(); ctx.ellipse(w/2, h*0.67, 14, 8, 0, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#fff'; ctx.fillRect(w/2-7, h*0.67-2, 14, 4);
-
-        // Foul lines
-        ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.moveTo(d.home.x, d.home.y); ctx.lineTo(0, h*0.2); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(d.home.x, d.home.y); ctx.lineTo(w, h*0.2); ctx.stroke();
-
-        // Warning track
-        ctx.strokeStyle = '#a0744a'; ctx.lineWidth = 10;
-        ctx.beginPath(); ctx.arc(w/2, h*1.2, w*0.75, Math.PI*1.12, Math.PI*1.88); ctx.stroke();
-
-        // Outfield wall
-        ctx.strokeStyle = '#0a4020'; ctx.lineWidth = 8;
-        ctx.beginPath(); ctx.arc(w/2, h*1.2, w*0.79, Math.PI*1.12, Math.PI*1.88); ctx.stroke();
-        // Wall padding (green)
-        ctx.strokeStyle = '#0d5a2a'; ctx.lineWidth = 4;
-        ctx.beginPath(); ctx.arc(w/2, h*1.2, w*0.79, Math.PI*1.12, Math.PI*1.88); ctx.stroke();
-
-        // Atmospheric depth
-        const fog = ctx.createLinearGradient(0, 0, 0, h * 0.35);
-        fog.addColorStop(0, 'rgba(10,30,50,0.35)'); fog.addColorStop(1, 'transparent');
-        ctx.fillStyle = fog; ctx.fillRect(0, 0, w, h * 0.35);
-
-        // Subtle light rays
-        ctx.save(); ctx.globalAlpha = 0.03;
-        for (let i = 0; i < 8; i++) {
-            ctx.fillStyle = '#fff';
-            ctx.beginPath(); ctx.moveTo(w * 0.5, 0); ctx.lineTo(w * 0.1 * i, h); ctx.lineTo(w * 0.1 * i + 30, h); ctx.closePath(); ctx.fill();
-        }
-        ctx.restore();
+        ctx.fillStyle = '#c49464';
+        ctx.beginPath(); ctx.ellipse(w / 2, h * 0.67, 18, 12, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#d4aa78';
+        ctx.beginPath(); ctx.ellipse(w / 2, h * 0.67, 12, 7, 0, 0, Math.PI * 2); ctx.fill();
+        // Rubber
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(w / 2 - 6, h * 0.67 - 1.5, 12, 3);
     }
 
     // ===== UPDATE CARD =====
@@ -404,39 +441,39 @@
         const bgLayer = $('#cardBgLayer');
         const nameplate = $('#cardNameplate');
 
-        // Card styles — bold borders, vivid gradients
+        // Card styles — real printed card: white border, team-colored inner frame & nameplate
         switch (style) {
             case 'classic':
-                bgLayer.style.background = `linear-gradient(180deg, ${primary} 0%, ${primary} 15%, ${secondary} 85%, ${secondary} 100%)`;
-                bgLayer.style.border = `${borderThickness}px solid ${primary}`;
+                bgLayer.style.background = `white`;
+                bgLayer.style.border = `none`;
                 bgLayer.style.borderImage = 'none';
-                nameplate.style.background = `linear-gradient(90deg, ${primary}ee, ${secondary}ee)`;
+                nameplate.style.background = primary;
                 break;
             case 'modern':
-                bgLayer.style.background = `linear-gradient(160deg, ${secondary} 0%, #050510 35%, #050510 65%, ${secondary} 100%)`;
-                bgLayer.style.border = `${borderThickness}px solid ${accent}`;
-                nameplate.style.background = `linear-gradient(90deg, rgba(0,0,0,0.92), ${secondary}dd)`;
+                bgLayer.style.background = `white`;
+                bgLayer.style.border = `none`;
+                nameplate.style.background = `linear-gradient(90deg, ${primary}, ${secondary})`;
                 break;
             case 'vintage':
-                bgLayer.style.background = `linear-gradient(180deg, #f5e6c8 0%, #eddcb0 20%, #e8d5a8 80%, #d4c090 100%)`;
-                bgLayer.style.border = `${borderThickness}px solid #8b7355`;
-                nameplate.style.background = `linear-gradient(90deg, #4a3228, #6d4c41, #4a3228)`;
+                bgLayer.style.background = `#faf6ee`;
+                bgLayer.style.border = `none`;
+                nameplate.style.background = `#5c3d2e`;
                 break;
             case 'elite':
-                bgLayer.style.background = `linear-gradient(150deg, #0a0a1a 0%, ${secondary}88 25%, #0a0a1a 50%, ${primary}88 75%, #0a0a1a 100%)`;
-                bgLayer.style.border = `${borderThickness}px solid ${accent}`;
-                nameplate.style.background = `linear-gradient(90deg, rgba(0,0,0,0.95), ${primary}55, rgba(0,0,0,0.95))`;
+                bgLayer.style.background = `white`;
+                bgLayer.style.border = `none`;
+                nameplate.style.background = `linear-gradient(90deg, ${primary}, ${accent}, ${secondary})`;
                 break;
             case 'rookie':
-                bgLayer.style.background = `linear-gradient(180deg, ${primary} 0%, ${primary}88 20%, #0a0a0a 50%, ${secondary}88 80%, ${secondary} 100%)`;
-                bgLayer.style.border = `${borderThickness}px solid #FFD700`;
-                nameplate.style.background = `linear-gradient(90deg, ${primary}dd, #111, ${secondary}dd)`;
+                bgLayer.style.background = `white`;
+                bgLayer.style.border = `none`;
+                nameplate.style.background = primary;
                 break;
         }
-        bgLayer.style.borderRadius = '5px';
+        bgLayer.style.borderRadius = '4px';
 
-        // Top bar
-        $('#cardTopBar').style.background = `linear-gradient(90deg, ${secondary}dd, ${secondary}44, transparent)`;
+        // Top bar — clean, sits in white border
+        $('#cardTopBar').style.background = `transparent`;
 
         // Name — auto-size with bolder feel
         const nameDisplay = $('#playerNameDisplay');
@@ -448,16 +485,17 @@
         teamDisplay.textContent = team;
         teamDisplay.style.color = nameColor;
 
-        // Inner photo frame accent
+        // Inner photo frame — team-colored solid border
         const photoBorder = $('#cardPhotoBorder');
-        photoBorder.style.borderColor = `${accent}55`;
-        photoBorder.style.boxShadow = `0 0 0 1px rgba(0,0,0,0.4), inset 0 0 0 1px ${accent}22, inset 0 1px 3px rgba(0,0,0,0.2)`;
+        photoBorder.style.borderColor = primary;
+        photoBorder.style.boxShadow = `0 0 0 1px rgba(0,0,0,0.1)`;
 
-        // Nameplate accent line
-        $('#nameplateAccent').style.background = `linear-gradient(90deg, ${accent}, ${primary}, transparent)`;
+        // Nameplate accent line — team accent color
+        $('#nameplateAccent').style.background = accent;
 
-        // Photo fade into nameplate — smoother, more dramatic
-        $('#cardPhotoFade').style.background = `linear-gradient(to bottom, transparent 0%, ${secondary}33 40%, ${secondary}aa 70%, ${secondary}ee 100%)`;
+        // Photo fade — gentle blend into nameplate
+        const nameplateColor = style === 'vintage' ? '#5c3d2e' : primary;
+        $('#cardPhotoFade').style.background = `linear-gradient(to bottom, transparent 50%, ${nameplateColor}cc 85%, ${nameplateColor} 100%)`;
 
         // Position badge
         const posBadge = $('#positionBadge');
@@ -490,8 +528,30 @@
             photoPlaceholder.style.display = 'block';
         }
 
-        // Field bg
-        $('#fieldBg').style.display = $('#showOnField').checked ? 'block' : 'none';
+        // Field background — built-in photo, canvas, custom upload, or none
+        const fieldSel = $('#fieldBgSelect').value;
+        const fieldBgDisplay = $('#fieldBgDisplay');
+        const fieldCanvas = $('#fieldCanvas');
+        const fieldBg = $('#fieldBg');
+
+        if (fieldSel === 'none') {
+            fieldBg.style.display = 'none';
+        } else if (fieldSel === 'custom' && state.fieldBg) {
+            fieldBgDisplay.src = state.fieldBg.src;
+            fieldBgDisplay.style.display = 'block';
+            fieldCanvas.style.display = 'none';
+            fieldBg.style.display = 'block';
+        } else if (builtInFieldCache[fieldSel]) {
+            fieldBgDisplay.src = builtInFieldCache[fieldSel].src;
+            fieldBgDisplay.style.display = 'block';
+            fieldCanvas.style.display = 'none';
+            fieldBg.style.display = 'block';
+        } else {
+            // Canvas fallback
+            fieldBgDisplay.style.display = 'none';
+            fieldCanvas.style.display = 'block';
+            fieldBg.style.display = 'block';
+        }
 
         // Vignette
         const vig = parseInt(vignetteStrength);
@@ -535,21 +595,42 @@
         const secondary = $('#secondaryColor').value;
         const accent = $('#accentColor').value;
 
-        $('#cardBackBg').style.background = `linear-gradient(180deg, ${secondary} 0%, #0a0a0a 40%, ${secondary}99 100%)`;
+        $('#cardBackBg').style.background = `#f0efe8`;
+        $('#cardBackBg').style.border = `5px solid ${primary}`;
+        $('#cardBackBg').style.borderRadius = '4px';
         $('#backNumber').textContent = `#${number}`;
         $('#backName').textContent = name;
         $('#backTeam').textContent = team;
-        $('#backHeader').style.background = `linear-gradient(90deg, ${primary}cc, ${secondary}cc)`;
-        $('#backAccentLine').style.background = `linear-gradient(90deg, ${accent}, ${primary}, transparent)`;
+        $('#backHeader').style.background = primary;
+        $('#backAccentLine').style.background = accent;
 
-        // Headshot on back
+        // Stats table header uses team color
+        document.querySelectorAll('.stats-table th').forEach(th => {
+            th.style.background = `${primary}18`;
+            th.style.color = primary;
+            th.style.borderBottomColor = primary;
+        });
+
+        // Headshot on back — with zoom/position controls
         const headshot = $('#backHeadshot');
+        const headshotControls = $('#headshotControls');
         if (state.playerPhoto) {
             headshot.src = state.playerPhoto.src;
             headshot.style.display = 'block';
+            headshotControls.style.display = 'block';
+            const hZoom = parseFloat($('#headshotZoom').value);
+            const hX = parseInt($('#headshotX').value);
+            const hY = parseInt($('#headshotY').value);
+            headshot.style.width = `${hZoom * 100}%`;
+            headshot.style.height = 'auto';
+            headshot.style.transform = `translate(calc(-50% + ${hX}px), calc(-50% + ${hY}px))`;
         } else {
             headshot.style.display = 'none';
+            headshotControls.style.display = 'none';
         }
+
+        // Info box uses team color border
+        $('#backInfoBox').style.borderColor = `${primary}30`;
 
         // Info
         $('#backPosition').textContent = $('#position').value;
@@ -575,6 +656,7 @@
         const bio = $('#bio').value;
         $('#backBio').style.display = bio ? 'block' : 'none';
         $('#backBioText').textContent = bio;
+        $('#backBio').style.borderLeftColor = accent;
 
         // League logo
         const leagueLogoArea = $('#backLeagueLogo');
@@ -598,7 +680,7 @@
             const el = $(`#stat_${s}`); vals[s] = el ? (el.value || '-') : '-';
         });
         const r1 = ['G','AB','R','H','HR','RBI','BB','SB'], r2 = ['2B','3B','SO','AVG','OBP','SLG','OPS'];
-        let h = year || league ? `<div style="font-size:0.55rem;color:rgba(255,255,255,0.45);text-align:center;margin-bottom:3px;letter-spacing:1px;text-transform:uppercase">${year} ${league?'- '+league:''} SEASON STATS</div>` : '';
+        let h = year || league ? `<div style="font-size:0.55rem;color:rgba(0,0,0,0.45);text-align:center;margin-bottom:3px;letter-spacing:1px;text-transform:uppercase">${year} ${league?'- '+league:''} SEASON STATS</div>` : '';
         h += `<table class="stats-table"><tr>${r1.map(s=>`<th>${s}</th>`).join('')}</tr><tr>${r1.map(s=>`<td>${vals[s]}</td>`).join('')}</tr></table>`;
         h += `<table class="stats-table" style="margin-top:3px"><tr>${r2.map(s=>`<th>${s}</th>`).join('')}</tr><tr>${r2.map(s=>`<td>${vals[s]}</td>`).join('')}</tr></table>`;
         return h;
@@ -607,7 +689,7 @@
     function buildPitchingStats(year, league) {
         const ids = [['W','stat_W'],['L','stat_L'],['ERA','stat_ERA'],['GP','stat_GP'],['GS','stat_GS'],['SV','stat_SV'],['IP','stat_IP'],['H','stat_HA'],['ER','stat_ER'],['BB','stat_PBB'],['K','stat_K'],['WHIP','stat_WHIP']];
         const r1 = ids.slice(0,6), r2 = ids.slice(6);
-        let h = year || league ? `<div style="font-size:0.55rem;color:rgba(255,255,255,0.45);text-align:center;margin-bottom:3px;letter-spacing:1px;text-transform:uppercase">${year} ${league?'- '+league:''} SEASON STATS</div>` : '';
+        let h = year || league ? `<div style="font-size:0.55rem;color:rgba(0,0,0,0.45);text-align:center;margin-bottom:3px;letter-spacing:1px;text-transform:uppercase">${year} ${league?'- '+league:''} SEASON STATS</div>` : '';
         h += `<table class="stats-table"><tr>${r1.map(([l])=>`<th>${l}</th>`).join('')}</tr><tr>${r1.map(([,id])=>`<td>${$(`#${id}`).value||'-'}</td>`).join('')}</tr></table>`;
         h += `<table class="stats-table" style="margin-top:3px"><tr>${r2.map(([l])=>`<th>${l}</th>`).join('')}</tr><tr>${r2.map(([,id])=>`<td>${$(`#${id}`).value||'-'}</td>`).join('')}</tr></table>`;
         return h;
@@ -743,6 +825,296 @@
             printArea.appendChild(backPage);
         }
     }
+
+    // ===== PHOTO EDITOR (Background Removal + Touch-up) =====
+    (function setupPhotoEditor() {
+        const overlay = $('#photoEditorOverlay');
+        const canvas = $('#editorCanvas');
+        const ctx = canvas.getContext('2d');
+        const loading = $('#editorLoading');
+        const loadingText = $('#editorLoadingText');
+
+        let originalImage = null;   // original uploaded image (Image element)
+        let originalData = null;    // original pixel data (ImageData)
+        let currentTool = 'eraser';
+        let brushSize = 25;
+        let brushSoftness = 0;
+        let isDrawing = false;
+        let bgRemoved = false;
+
+        // Open editor from "Remove Background" button
+        $('#removeBgBtn').addEventListener('click', () => {
+            if (!state.playerPhoto) return;
+            openEditor(state.playerPhoto, true);
+        });
+
+        // Open editor from "Touch Up Cutout" button
+        $('#editCutoutBtn').addEventListener('click', () => {
+            if (!state.playerPhoto) return;
+            openEditor(state.playerPhoto, false);
+        });
+
+        function openEditor(img, autoRemove) {
+            overlay.classList.add('open');
+            originalImage = img;
+
+            // Size canvas to image, but cap for display
+            const maxW = Math.min(img.naturalWidth || img.width, 700);
+            const scale = maxW / (img.naturalWidth || img.width);
+            canvas.width = Math.round((img.naturalWidth || img.width) * scale);
+            canvas.height = Math.round((img.naturalHeight || img.height) * scale);
+
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            originalData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+            if (autoRemove) {
+                runAutoRemove();
+            }
+        }
+
+        function closeEditor() {
+            overlay.classList.remove('open');
+            bgRemoved = false;
+        }
+
+        $('#photoEditorClose').addEventListener('click', closeEditor);
+        $('#editorCancel').addEventListener('click', closeEditor);
+        overlay.addEventListener('click', e => { if (e.target === overlay) closeEditor(); });
+
+        // Tool selection
+        $$('.editor-tool-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                $$('.editor-tool-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentTool = btn.dataset.tool;
+            });
+        });
+
+        // Brush size
+        $('#brushSize').addEventListener('input', e => {
+            brushSize = parseInt(e.target.value);
+            $('#brushSizeLabel').textContent = brushSize;
+        });
+
+        // Brush softness
+        $('#brushSoftness').addEventListener('input', e => {
+            brushSoftness = parseInt(e.target.value);
+        });
+
+        // Reset
+        $('#editorReset').addEventListener('click', () => {
+            if (!originalData) return;
+            ctx.putImageData(originalData, 0, 0);
+            bgRemoved = false;
+        });
+
+        // Auto remove button inside editor
+        $('#editorAutoRemove').addEventListener('click', () => runAutoRemove());
+
+        // Apply cutout
+        $('#editorApply').addEventListener('click', () => {
+            // Convert canvas to image and update state
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const img = new Image();
+                img.onload = () => {
+                    state.playerPhoto = img;
+                    // Update preview
+                    const preview = $('#playerPhotoPreview');
+                    preview.src = url;
+                    preview.style.display = 'block';
+                    // Show touch-up button
+                    $('#editCutoutBtn').style.display = 'block';
+                    updateCard();
+                    closeEditor();
+                };
+                img.src = url;
+            }, 'image/png');
+        });
+
+        // ===== AUTO BACKGROUND REMOVAL (MediaPipe Selfie Segmentation) =====
+        async function runAutoRemove() {
+            loading.style.display = 'flex';
+            loadingText.textContent = 'Loading AI model...';
+
+            try {
+                // Prepare source image at full resolution for segmentation
+                const srcCanvas = document.createElement('canvas');
+                srcCanvas.width = canvas.width;
+                srcCanvas.height = canvas.height;
+                const srcCtx = srcCanvas.getContext('2d');
+                srcCtx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
+
+                // Init segmenter
+                const seg = new SelfieSegmentation({
+                    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`
+                });
+                seg.setOptions({ modelSelection: 1 });
+
+                loadingText.textContent = 'Analyzing image...';
+
+                const maskPromise = new Promise((resolve, reject) => {
+                    seg.onResults((results) => {
+                        resolve(results.segmentationMask);
+                    });
+                    // Small timeout for safety
+                    setTimeout(() => reject(new Error('Segmentation timed out')), 30000);
+                });
+
+                await seg.send({ image: srcCanvas });
+                const mask = await maskPromise;
+
+                loadingText.textContent = 'Removing background...';
+
+                // Apply mask: draw original image, then erase background using mask
+                // The mask is a canvas/image where white = person, black = background
+                const maskCanvas = document.createElement('canvas');
+                maskCanvas.width = canvas.width;
+                maskCanvas.height = canvas.height;
+                const maskCtx = maskCanvas.getContext('2d');
+                maskCtx.drawImage(mask, 0, 0, canvas.width, canvas.height);
+
+                const maskData = maskCtx.getImageData(0, 0, canvas.width, canvas.height);
+                const imgData = srcCtx.getImageData(0, 0, canvas.width, canvas.height);
+
+                // Apply mask to alpha channel — mask R channel > threshold = keep
+                for (let i = 0; i < imgData.data.length; i += 4) {
+                    const confidence = maskData.data[i]; // R channel = person confidence
+                    if (confidence < 128) {
+                        // Background — make transparent
+                        imgData.data[i + 3] = 0;
+                    } else if (confidence < 200) {
+                        // Edge — partial transparency for smooth edges
+                        imgData.data[i + 3] = Math.round((confidence - 128) / 72 * 255);
+                    }
+                    // else: fully opaque (person)
+                }
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.putImageData(imgData, 0, 0);
+                bgRemoved = true;
+                loading.style.display = 'none';
+
+                seg.close();
+
+            } catch (err) {
+                console.error('Auto background removal failed:', err);
+                loadingText.textContent = 'Auto-removal failed. Use the eraser tool to remove background manually.';
+                setTimeout(() => { loading.style.display = 'none'; }, 2500);
+            }
+        }
+
+        // ===== MANUAL BRUSH TOOLS =====
+        function getCanvasPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY
+            };
+        }
+
+        function brushAt(x, y) {
+            const r = brushSize;
+            const softEdge = brushSoftness / 100;
+
+            if (currentTool === 'eraser') {
+                if (softEdge > 0) {
+                    // Soft eraser — use radial gradient for feathered edge
+                    const imgData = ctx.getImageData(
+                        Math.max(0, Math.floor(x - r)),
+                        Math.max(0, Math.floor(y - r)),
+                        Math.min(r * 2, canvas.width),
+                        Math.min(r * 2, canvas.height)
+                    );
+                    const cx = x - Math.max(0, Math.floor(x - r));
+                    const cy = y - Math.max(0, Math.floor(y - r));
+                    for (let py = 0; py < imgData.height; py++) {
+                        for (let px = 0; px < imgData.width; px++) {
+                            const dist = Math.sqrt((px - cx) ** 2 + (py - cy) ** 2);
+                            if (dist < r) {
+                                const idx = (py * imgData.width + px) * 4;
+                                const hardRadius = r * (1 - softEdge);
+                                if (dist < hardRadius) {
+                                    imgData.data[idx + 3] = 0;
+                                } else {
+                                    const blend = (dist - hardRadius) / (r - hardRadius);
+                                    imgData.data[idx + 3] = Math.round(imgData.data[idx + 3] * blend);
+                                }
+                            }
+                        }
+                    }
+                    ctx.putImageData(imgData, Math.max(0, Math.floor(x - r)), Math.max(0, Math.floor(y - r)));
+                } else {
+                    // Hard eraser — clear circle
+                    ctx.save();
+                    ctx.globalCompositeOperation = 'destination-out';
+                    ctx.beginPath();
+                    ctx.arc(x, y, r, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            } else if (currentTool === 'restore') {
+                // Restore from original data
+                if (!originalData) return;
+                const sx = Math.max(0, Math.floor(x - r));
+                const sy = Math.max(0, Math.floor(y - r));
+                const sw = Math.min(r * 2, canvas.width - sx);
+                const sh = Math.min(r * 2, canvas.height - sy);
+
+                const current = ctx.getImageData(sx, sy, sw, sh);
+                const cx = x - sx;
+                const cy = y - sy;
+
+                for (let py = 0; py < sh; py++) {
+                    for (let px = 0; px < sw; px++) {
+                        const dist = Math.sqrt((px - cx) ** 2 + (py - cy) ** 2);
+                        if (dist < r) {
+                            const idx = (py * sw + px) * 4;
+                            const origIdx = ((sy + py) * originalData.width + (sx + px)) * 4;
+                            current.data[idx] = originalData.data[origIdx];
+                            current.data[idx + 1] = originalData.data[origIdx + 1];
+                            current.data[idx + 2] = originalData.data[origIdx + 2];
+                            current.data[idx + 3] = originalData.data[origIdx + 3];
+                        }
+                    }
+                }
+                ctx.putImageData(current, sx, sy);
+            }
+        }
+
+        // Drawing events — mouse
+        canvas.addEventListener('mousedown', e => {
+            isDrawing = true;
+            const pos = getCanvasPos(e);
+            brushAt(pos.x, pos.y);
+        });
+        canvas.addEventListener('mousemove', e => {
+            if (!isDrawing) return;
+            const pos = getCanvasPos(e);
+            brushAt(pos.x, pos.y);
+        });
+        canvas.addEventListener('mouseup', () => { isDrawing = false; });
+        canvas.addEventListener('mouseleave', () => { isDrawing = false; });
+
+        // Drawing events — touch
+        canvas.addEventListener('touchstart', e => {
+            e.preventDefault();
+            isDrawing = true;
+            const pos = getCanvasPos(e);
+            brushAt(pos.x, pos.y);
+        }, { passive: false });
+        canvas.addEventListener('touchmove', e => {
+            e.preventDefault();
+            if (!isDrawing) return;
+            const pos = getCanvasPos(e);
+            brushAt(pos.x, pos.y);
+        }, { passive: false });
+        canvas.addEventListener('touchend', () => { isDrawing = false; });
+    })();
 
     // ===== FOIL + GLOSS MOUSE EFFECTS =====
     document.addEventListener('mousemove', e => {

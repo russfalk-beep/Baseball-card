@@ -6,6 +6,7 @@
     <title>Baseball Card Maker Pro</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto+Condensed:wght@400;700&family=Anton&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <div class="app-container">
@@ -143,8 +144,10 @@
                             <img id="playerPhotoPreview" class="upload-preview" style="display:none">
                         </div>
                         <div class="photo-controls" id="playerPhotoControls" style="display:none">
+                            <button class="btn-remove-bg" id="removeBgBtn">&#9986; Remove Background</button>
+                            <button class="btn-edit-cutout" id="editCutoutBtn" style="display:none">&#9998; Touch Up Cutout</button>
                             <label>Zoom</label>
-                            <input type="range" id="playerPhotoZoom" min="0.5" max="3" step="0.05" value="1">
+                            <input type="range" id="playerPhotoZoom" min="0.1" max="3" step="0.05" value="1">
                             <label>X Position</label>
                             <input type="range" id="playerPhotoX" min="-200" max="200" step="1" value="0">
                             <label>Y Position</label>
@@ -155,11 +158,41 @@
                             <input type="range" id="playerContrast" min="50" max="200" step="1" value="100">
                             <label>Saturation</label>
                             <input type="range" id="playerSaturation" min="0" max="200" step="1" value="100">
-                            <div class="checkbox-row">
-                                <input type="checkbox" id="showOnField" checked>
-                                <label for="showOnField">Show baseball field background</label>
-                            </div>
                             <button class="btn-secondary" id="removePlayerPhoto">Remove Photo</button>
+                        </div>
+                        <div class="photo-controls" id="headshotControls" style="display:none">
+                            <p class="section-title" style="border-top:none;margin-top:0;padding-top:0">Back Card Thumbnail</p>
+                            <label>Thumbnail Zoom</label>
+                            <input type="range" id="headshotZoom" min="0.5" max="4" step="0.1" value="1.5">
+                            <label>X Position</label>
+                            <input type="range" id="headshotX" min="-100" max="100" step="1" value="0">
+                            <label>Y Position</label>
+                            <input type="range" id="headshotY" min="-100" max="100" step="1" value="0">
+                        </div>
+                    </div>
+
+                    <div class="upload-section">
+                        <label class="upload-label">Field Background</label>
+                        <p class="upload-hint">Choose a built-in field or upload your own.</p>
+                        <div class="form-group">
+                            <select id="fieldBgSelect">
+                                <option value="photo-daytime">Daytime Field</option>
+                                <option value="photo-diamond">Diamond View</option>
+                                <option value="canvas">Illustrated Field</option>
+                                <option value="none">No Background (solid color)</option>
+                                <option value="custom">Upload Custom Photo...</option>
+                            </select>
+                        </div>
+                        <div class="upload-box small" id="fieldBgUpload" style="display:none">
+                            <input type="file" id="fieldBgInput" accept="image/*" hidden>
+                            <div class="upload-placeholder" id="fieldBgPlaceholder">
+                                <svg viewBox="0 0 64 64" width="36" height="36"><rect x="4" y="32" width="56" height="24" rx="2" fill="none" stroke="#999" stroke-width="2"/><path d="M4 42 Q32 20 60 42" fill="none" stroke="#999" stroke-width="2"/><circle cx="50" cy="14" r="6" fill="none" stroke="#999" stroke-width="2"/></svg>
+                                <span>Upload your own field photo</span>
+                            </div>
+                            <img id="fieldBgPreview" class="upload-preview" style="display:none">
+                        </div>
+                        <div class="photo-controls" id="fieldBgControls" style="display:none">
+                            <button class="btn-secondary" id="removeFieldBg">Remove Field Photo</button>
                         </div>
                     </div>
 
@@ -507,6 +540,7 @@
                             <div class="card-photo-area" id="cardPhotoArea">
                                 <div class="field-bg" id="fieldBg">
                                     <canvas id="fieldCanvas" width="600" height="500"></canvas>
+                                    <img id="fieldBgDisplay" class="field-bg-display" style="display:none">
                                 </div>
                                 <div class="player-photo-container" id="playerPhotoContainer">
                                     <img id="playerPhotoDisplay" class="player-photo-display">
@@ -704,6 +738,43 @@
     </div>
 
     <!-- Print template (hidden, rendered at print time) -->
+    <!-- Photo Editor Modal -->
+    <div class="photo-editor-overlay" id="photoEditorOverlay">
+        <div class="photo-editor-modal">
+            <div class="photo-editor-header">
+                <h2>Photo Editor</h2>
+                <button class="photo-editor-close" id="photoEditorClose">&times;</button>
+            </div>
+            <div class="photo-editor-toolbar">
+                <button class="editor-tool-btn active" id="toolEraser" data-tool="eraser" title="Erase background">&#9986; Eraser</button>
+                <button class="editor-tool-btn" id="toolRestore" data-tool="restore" title="Restore erased areas">&#9998; Restore</button>
+                <div class="toolbar-divider"></div>
+                <label class="toolbar-label">Size</label>
+                <input type="range" id="brushSize" min="5" max="80" value="25" class="toolbar-range">
+                <span id="brushSizeLabel" class="toolbar-value">25</span>
+                <div class="toolbar-divider"></div>
+                <label class="toolbar-label">Softness</label>
+                <input type="range" id="brushSoftness" min="0" max="100" value="0" class="toolbar-range">
+                <div class="toolbar-divider"></div>
+                <button class="editor-action-btn" id="editorAutoRemove" title="Auto-remove background">&#10024; Auto Remove</button>
+                <button class="editor-action-btn" id="editorReset" title="Reset to original">&#8634; Reset</button>
+            </div>
+            <div class="photo-editor-canvas-area">
+                <div class="editor-loading" id="editorLoading" style="display:none">
+                    <div class="loading-spinner"></div>
+                    <p id="editorLoadingText">Removing background...</p>
+                    <p class="loading-subtext">First use downloads the AI model (~5 seconds)</p>
+                </div>
+                <canvas id="editorCanvas"></canvas>
+                <canvas id="editorOverlay" class="editor-overlay-canvas"></canvas>
+            </div>
+            <div class="photo-editor-footer">
+                <button class="btn-secondary" id="editorCancel">Cancel</button>
+                <button class="btn-primary" id="editorApply">Apply Cutout</button>
+            </div>
+        </div>
+    </div>
+
     <div id="printArea" class="print-area">
         <!-- Pages inserted dynamically -->
     </div>
