@@ -758,7 +758,7 @@
         function wrapCard(cardEl) {
             const wrapper = document.createElement('div');
             // Position absolutely on the page for exact front/back alignment
-            wrapper.style.cssText = `width:2.75in;height:3.75in;position:absolute;top:3.625in;left:50%;margin-left:-1.375in;display:flex;align-items:center;justify-content:center;`;
+            wrapper.style.cssText = `width:2.75in;height:3.75in;position:absolute;top:3.625in;left:0;right:0;margin:0 auto;display:flex;align-items:center;justify-content:center;`;
             wrapper.innerHTML = makeCropMarks(showCropMarks);
 
             // Card container — holds the scaled-down card
