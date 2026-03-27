@@ -1607,7 +1607,7 @@ input[type="range"] {
     .print-card .card-year-display { font-size: 0.5rem !important; }
     .print-card .brand-logo-display { height: 14px !important; }
     .print-card .card-number-front { font-size: 0.35rem !important; bottom: 2px !important; right: 6px !important; }
-    .print-card .card-photo-fade { height: 25px !important; }
+    .print-card .card-photo-fade { display: none !important; }
     .print-card .card-photo-border { top: 22px !important; left: 6px !important; right: 6px !important; border-width: 2px !important; }
     .print-card .card-team-logo { top: 26px !important; right: 10px !important; width: 35px !important; height: 35px !important; }
     .print-card .rookie-badge { font-size: 0.35rem !important; padding: 2px 5px !important; bottom: 34px !important; }
@@ -1637,7 +1637,8 @@ input[type="range"] {
     /* Remove screen-only effects for clean print */
     .print-card .card-gloss,
     .print-card .card-foil-layer,
-    .print-card .card-rainbow-layer { display: none !important; }
+    .print-card .card-rainbow-layer,
+    .print-card .photo-vignette { display: none !important; }
 
     /* Crop marks */
     .crop-mark {
