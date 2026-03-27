@@ -564,12 +564,6 @@ input[type="range"] {
     inset: 0;
     z-index: 0;
 }
-#fieldCanvas {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: none;
-}
 .field-bg-display {
     position: absolute;
     inset: 0;
