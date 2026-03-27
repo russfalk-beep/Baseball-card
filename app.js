@@ -533,25 +533,30 @@
         const fieldSel = $('#fieldBgSelect').value;
         const fieldBgDisplay = $('#fieldBgDisplay');
         const fieldCanvas = $('#fieldCanvas');
-        const fieldBg = $('#fieldBg');
+        const fieldBgEl = $('#fieldBg');
 
         if (fieldSel === 'none') {
-            fieldBg.style.display = 'none';
+            fieldBgEl.style.display = 'none';
         } else if (fieldSel === 'custom' && state.fieldBg) {
             fieldBgDisplay.src = state.fieldBg.src;
             fieldBgDisplay.style.display = 'block';
             fieldCanvas.style.display = 'none';
-            fieldBg.style.display = 'block';
-        } else if (builtInFieldCache[fieldSel]) {
-            fieldBgDisplay.src = builtInFieldCache[fieldSel].src;
+            fieldBgEl.style.display = 'block';
+        } else if (builtInFields[fieldSel]) {
+            // Use path directly — no cache dependency
+            fieldBgDisplay.src = builtInFields[fieldSel];
             fieldBgDisplay.style.display = 'block';
             fieldCanvas.style.display = 'none';
-            fieldBg.style.display = 'block';
-        } else {
-            // Canvas fallback
+            fieldBgEl.style.display = 'block';
+        } else if (fieldSel === 'canvas') {
             fieldBgDisplay.style.display = 'none';
             fieldCanvas.style.display = 'block';
-            fieldBg.style.display = 'block';
+            fieldBgEl.style.display = 'block';
+        } else {
+            // Fallback
+            fieldBgDisplay.style.display = 'none';
+            fieldCanvas.style.display = 'block';
+            fieldBgEl.style.display = 'block';
         }
 
         // Vignette
