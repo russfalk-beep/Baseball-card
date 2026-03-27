@@ -632,10 +632,7 @@
                 const node = el.querySelector(sel);
                 if (node) node.remove();
             });
-            el.style.cssText += `width:${CARD_W}px !important;height:${CARD_H}px !important;`;
-            // Prevent stats table from stretching to fill empty space
-            const statsTable = el.querySelector('.back-stats-table');
-            if (statsTable) statsTable.style.flex = '0 0 auto';
+            el.style.cssText += `width:${CARD_W}px !important;height:${CARD_H}px !important;overflow:hidden !important;`;
             return el;
         };
 
@@ -665,7 +662,7 @@
 
             // Inner container at screen size, scaled down
             const scaleWrap = document.createElement('div');
-            scaleWrap.style.cssText = `width:${CARD_W}px;height:${CARD_H}px;transform:scale(${SCALE});transform-origin:top left;filter:none;`;
+            scaleWrap.style.cssText = `width:${CARD_W}px;height:${CARD_H}px;transform:scale(${SCALE});transform-origin:top left;filter:none;overflow:hidden;`;
             scaleWrap.appendChild(cardEl);
 
             cardDiv.appendChild(scaleWrap);
@@ -717,7 +714,7 @@
             }
 
             const flipNote = document.createElement('div');
-            flipNote.className = 'print-flip-note';
+            flipNote.style.cssText = 'position:absolute;bottom:0.2in;left:50%;transform:translateX(-50%);font-size:7pt;color:#bbb;font-family:Arial,sans-serif;white-space:nowrap;';
             flipNote.textContent = 'Feed this page back through your printer — select "Flip on Long Edge"';
             backPage.appendChild(flipNote);
             printArea.appendChild(backPage);
