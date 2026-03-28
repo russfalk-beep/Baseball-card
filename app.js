@@ -529,9 +529,8 @@
         $('#backBioText').textContent = bio;
         $('#backBio').style.borderLeftColor = accent;
 
-        // League logo
+        // League logo — absolutely positioned so it always shows
         const leagueLogoArea = $('#backLeagueLogo');
-        const bioEl = $('#backBio');
         if (state.leagueLogo) {
             const logoSize = parseInt($('#leagueLogoSize').value);
             const leagueImg = $('#leagueLogoDisplay');
@@ -540,11 +539,8 @@
             leagueImg.style.width = 'auto';
             leagueImg.style.display = 'block';
             leagueLogoArea.style.display = 'flex';
-            // Limit bio height so league logo isn't pushed off card
-            bioEl.style.maxHeight = '60px';
         } else {
             leagueLogoArea.style.display = 'none';
-            bioEl.style.maxHeight = '';
         }
 
         // Footer

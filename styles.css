@@ -1027,8 +1027,11 @@ input[type="range"] {
 
 /* League logo on back */
 .back-league-logo {
-    position: relative;
-    z-index: 2;
+    position: absolute;
+    bottom: 22px;
+    left: 0;
+    right: 0;
+    z-index: 3;
     display: flex;
     justify-content: center;
     align-items: center;
