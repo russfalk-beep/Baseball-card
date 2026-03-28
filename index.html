@@ -522,6 +522,11 @@
                     <select id="loadDesign"><option value="">Load Saved Design...</option></select>
                     <button class="design-btn danger" id="deleteDesign">Delete</button>
                 </div>
+                <div class="design-save-controls" style="margin-top:4px;">
+                    <button class="design-btn" id="exportDesign" style="background:#059669;border-color:#059669;">Export File</button>
+                    <button class="design-btn" id="importDesign" style="background:#0284c7;border-color:#0284c7;">Import File</button>
+                    <input type="file" id="importDesignFile" accept=".json" hidden>
+                </div>
 
                 <div class="card-preview-area">
                     <!-- FRONT OF CARD -->
@@ -783,6 +788,6 @@
         <!-- Pages inserted dynamically -->
     </div>
 
-    <script src="app.js?v=20260327v"></script>
+    <script src="app.js?v=20260327w"></script>
 </body>
 </html>

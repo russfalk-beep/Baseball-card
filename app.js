@@ -1255,6 +1255,40 @@
             refreshDropdown();
         });
 
+        // Export design as JSON file
+        $('#exportDesign').addEventListener('click', () => {
+            const data = collectFormData();
+            const playerName = $('#playerName').value.trim() || 'card';
+            const fileName = `${playerName.replace(/\s+/g, '_')}_design.json`;
+            const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Import design from JSON file
+        const importInput = $('#importDesignFile');
+        $('#importDesign').addEventListener('click', () => importInput.click());
+        importInput.addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    loadFormData(data);
+                    alert('Design imported!');
+                } catch (err) {
+                    alert('Invalid design file.');
+                }
+            };
+            reader.readAsText(file);
+            importInput.value = '';
+        });
+
         refreshDropdown();
     }
 
