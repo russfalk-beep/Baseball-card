@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Baseball Card Maker Pro</title>
-    <link rel="stylesheet" href="styles.css?v=20260327y">
+    <link rel="stylesheet" href="styles.css?v=20260407a">
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto+Condensed:wght@400;700&family=Anton&family=Bebas+Neue&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
+    <div id="toastContainer" class="toast-container"></div>
     <div class="app-container">
         <!-- Header -->
         <header class="app-header">
@@ -529,8 +530,9 @@
                 </div>
 
                 <div class="card-preview-area">
+                  <div class="card-flipper" id="cardFlipper">
                     <!-- FRONT OF CARD -->
-                    <div class="card-container" id="cardFront">
+                    <div class="card-container card-face card-face-front" id="cardFront">
                         <div class="card baseball-card front" id="cardFrontInner">
                             <!-- Dynamic background -->
                             <div class="card-bg-layer" id="cardBgLayer"></div>
@@ -602,7 +604,7 @@
                     </div>
 
                     <!-- BACK OF CARD -->
-                    <div class="card-container" id="cardBack" style="display:none">
+                    <div class="card-container card-face card-face-back" id="cardBack">
                         <div class="card baseball-card back" id="cardBackInner">
                             <div class="card-back-bg" id="cardBackBg"></div>
                             <div class="card-back-texture"></div>
@@ -678,6 +680,7 @@
                             </div>
                         </div>
                     </div>
+                  </div>
                 </div>
             </div>
         </div>
@@ -788,6 +791,6 @@
         <!-- Pages inserted dynamically -->
     </div>
 
-    <script src="app.js?v=20260327w"></script>
+    <script src="app.js?v=20260407a"></script>
 </body>
 </html>

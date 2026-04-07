@@ -6,6 +6,51 @@
     const $ = (sel) => document.querySelector(sel);
     const $$ = (sel) => document.querySelectorAll(sel);
 
+    // --- Toast notification system ---
+    function toast(message, type = 'info', duration = 3000) {
+        const container = $('#toastContainer');
+        const icons = { success: '\u2713', error: '\u2717', info: '\u24D8', warning: '\u26A0' };
+        const el = document.createElement('div');
+        el.className = `toast toast-${type}`;
+        el.innerHTML = `<span class="toast-icon">${icons[type] || ''}</span><span>${message}</span>`;
+        container.appendChild(el);
+        requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
+        setTimeout(() => {
+            el.classList.remove('show');
+            setTimeout(() => el.remove(), 400);
+        }, duration);
+    }
+
+    // --- Debounce helper ---
+    function debounce(fn, ms) {
+        let timer;
+        return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
+    }
+    const debouncedUpdateCard = debounce(() => updateCard(), 60);
+
+    // --- Loading overlay ---
+    function showLoadingOverlay(title, subtitle) {
+        let overlay = $('#pdfLoadingOverlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'pdfLoadingOverlay';
+            overlay.className = 'pdf-loading-overlay';
+            overlay.innerHTML = `<div class="loading-spinner"></div><p></p><p class="loading-subtext"></p>`;
+            document.body.appendChild(overlay);
+        }
+        overlay.querySelector('p').textContent = title || 'Processing...';
+        overlay.querySelector('.loading-subtext').textContent = subtitle || '';
+        overlay.style.display = 'flex';
+        requestAnimationFrame(() => overlay.classList.add('show'));
+    }
+    function hideLoadingOverlay() {
+        const overlay = $('#pdfLoadingOverlay');
+        if (overlay) {
+            overlay.classList.remove('show');
+            setTimeout(() => { overlay.style.display = 'none'; }, 300);
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         setupTabs();
         setupUploads();
@@ -112,7 +157,13 @@
         ];
         allInputs.forEach(id => {
             const el = $(`#${id}`);
-            if (el) { el.addEventListener('input', updateCard); el.addEventListener('change', updateCard); }
+            if (el) {
+                // Sliders/colors update instantly; text inputs debounce for smooth typing
+                const isRange = el.type === 'range' || el.type === 'color' || el.type === 'checkbox' || el.tagName === 'SELECT';
+                const handler = isRange ? updateCard : debouncedUpdateCard;
+                el.addEventListener('input', handler);
+                el.addEventListener('change', updateCard);
+            }
         });
         ['primary','secondary','accent','name'].forEach(c => {
             const input = $(`#${c}Color`), label = $(`#${c}ColorLabel`);
@@ -263,36 +314,29 @@
         $('#showFront').addEventListener('click', () => {
             state.showFront = true;
             $('#showFront').classList.add('active'); $('#showBack').classList.remove('active');
-            $('#cardFront').style.display = 'block'; $('#cardBack').style.display = 'none';
+            $('#cardFlipper').classList.remove('flipped');
         });
         $('#showBack').addEventListener('click', () => {
             state.showFront = false;
             $('#showBack').classList.add('active'); $('#showFront').classList.remove('active');
-            $('#cardFront').style.display = 'none'; $('#cardBack').style.display = 'block';
+            $('#cardFlipper').classList.add('flipped');
         });
     }
 
     // ===== 3D TILT =====
     function setup3DTilt() {
-        const container = $('#cardFront');
-        container.addEventListener('mousemove', e => {
+        const flipper = $('#cardFlipper');
+        flipper.addEventListener('mousemove', e => {
             if (!$('#show3DTilt').checked) return;
-            const rect = container.getBoundingClientRect();
+            const rect = flipper.getBoundingClientRect();
             const x = (e.clientX - rect.left) / rect.width - 0.5;
             const y = (e.clientY - rect.top) / rect.height - 0.5;
-            container.style.transform = `perspective(800px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg)`;
+            const baseFlip = state.showFront ? '' : ' rotateY(180deg)';
+            flipper.style.transform = `rotateY(${x * 12}deg) rotateX(${-y * 12}deg)${baseFlip}`;
         });
-        container.addEventListener('mouseleave', () => { container.style.transform = ''; });
-
-        const backContainer = $('#cardBack');
-        backContainer.addEventListener('mousemove', e => {
-            if (!$('#show3DTilt').checked) return;
-            const rect = backContainer.getBoundingClientRect();
-            const x = (e.clientX - rect.left) / rect.width - 0.5;
-            const y = (e.clientY - rect.top) / rect.height - 0.5;
-            backContainer.style.transform = `perspective(800px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg)`;
+        flipper.addEventListener('mouseleave', () => {
+            flipper.style.transform = state.showFront ? '' : 'rotateY(180deg)';
         });
-        backContainer.addEventListener('mouseleave', () => { backContainer.style.transform = ''; });
     }
 
     // ===== UPDATE CARD =====
@@ -604,14 +648,16 @@
         // Save as PDF — generates a proper PDF with exact alignment
         $('#savePdf').addEventListener('click', async () => {
             const btn = $('#savePdf');
-            btn.textContent = 'Generating...';
             btn.disabled = true;
+            showLoadingOverlay('Generating PDF...', 'Rendering high-resolution card');
             try {
                 await generatePDF();
+                toast('PDF saved!', 'success');
             } catch (e) {
                 console.error('PDF generation failed:', e);
-                alert('PDF generation failed. Try again.');
+                toast('PDF generation failed. Try again.', 'error');
             }
+            hideLoadingOverlay();
             btn.textContent = 'Save PDF';
             btn.disabled = false;
         });
@@ -620,11 +666,11 @@
     async function generatePDF() {
         // Check libraries loaded
         if (typeof html2canvas === 'undefined') {
-            alert('html2canvas library failed to load. Check your internet connection and refresh.');
+            toast('html2canvas library failed to load. Check your connection and refresh.', 'error', 5000);
             return;
         }
         if (!window.jspdf) {
-            alert('jsPDF library failed to load. Check your internet connection and refresh.');
+            toast('jsPDF library failed to load. Check your connection and refresh.', 'error', 5000);
             return;
         }
         const { jsPDF } = window.jspdf;
@@ -1230,7 +1276,7 @@
             designs[name] = collectFormData();
             saveDesigns(designs);
             refreshDropdown();
-            alert(`Design "${name}" saved!`);
+            toast(`Design "${name}" saved!`, 'success');
         });
 
         $('#loadDesign').addEventListener('change', () => {
@@ -1245,7 +1291,7 @@
             const select = $('#loadDesign');
             const name = select.value;
             if (!name) {
-                alert('Select a design from the dropdown first, then click Delete.');
+                toast('Select a design from the dropdown first, then click Delete.', 'warning');
                 return;
             }
             if (!confirm(`Delete design "${name}"?`)) return;
@@ -1280,9 +1326,9 @@
                 try {
                     const data = JSON.parse(ev.target.result);
                     loadFormData(data);
-                    alert('Design imported!');
+                    toast('Design imported!', 'success');
                 } catch (err) {
-                    alert('Invalid design file.');
+                    toast('Invalid design file.', 'error');
                 }
             };
             reader.readAsText(file);

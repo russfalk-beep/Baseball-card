@@ -31,7 +31,19 @@ body {
     text-align: center;
     padding: 24px 16px 16px;
     background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
-    border-bottom: 3px solid var(--accent);
+    border-bottom: none;
+    position: relative;
+}
+.app-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), #ff6b81, #f59e0b, #10b981, var(--accent));
+    background-size: 200% 100%;
+    animation: headerGlow 4s linear infinite;
 }
 .logo-area {
     display: flex;
@@ -64,6 +76,11 @@ body {
     max-width: 1400px;
     margin: 0 auto;
     align-items: flex-start;
+    animation: pageEnter 0.5s ease-out;
+}
+@keyframes pageEnter {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 .editor-panel {
     flex: 1;
@@ -172,7 +189,15 @@ body {
     background: none;
     padding: 2px;
 }
-.color-label { font-size: 0.85rem; color: var(--text-secondary); font-family: monospace; }
+.color-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-family: 'Roboto Condensed', sans-serif;
+    background: rgba(0,0,0,0.2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+}
 
 /* Team presets */
 .team-presets {
@@ -439,13 +464,33 @@ input[type="range"] {
 .card-preview-area {
     perspective: 1200px;
 }
+.card-flipper {
+    width: var(--card-width);
+    height: var(--card-height);
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-flipper.flipped {
+    transform: rotateY(180deg);
+}
+.card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+.card-face-back {
+    transform: rotateY(180deg);
+}
 .card-container {
     width: var(--card-width);
     height: var(--card-height);
     filter:
-        drop-shadow(0 1px 2px rgba(0,0,0,0.2))
-        drop-shadow(0 4px 12px rgba(0,0,0,0.25))
-        drop-shadow(0 12px 30px rgba(0,0,0,0.15));
+        drop-shadow(0 2px 4px rgba(0,0,0,0.25))
+        drop-shadow(0 8px 24px rgba(0,0,0,0.3))
+        drop-shadow(0 16px 48px rgba(0,0,0,0.15));
 }
 .baseball-card {
     width: 100%;
@@ -1578,8 +1623,7 @@ input[type="range"] {
 .tab-content::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
 /* ===== CARD 3D TILT ===== */
-.card-container {
-    transition: transform 0.1s ease-out;
+.card-flipper {
     transform-style: preserve-3d;
 }
 
@@ -1592,4 +1636,158 @@ input[type="range"] {
     background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.1) 50%, transparent 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
+}
+
+/* ===== TOAST NOTIFICATIONS ===== */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+}
+.toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    background: rgba(22, 33, 62, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    transform: translateX(120%);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    max-width: 340px;
+}
+.toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+.toast.toast-success { border-left: 4px solid #10b981; }
+.toast.toast-error { border-left: 4px solid #ef4444; }
+.toast.toast-info { border-left: 4px solid #3b82f6; }
+.toast.toast-warning { border-left: 4px solid #f59e0b; }
+.toast-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+/* ===== BUTTON ENHANCEMENTS ===== */
+.preview-btn, .design-btn, .btn-print-go, .btn-primary {
+    position: relative;
+    overflow: hidden;
+}
+.preview-btn::after, .design-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%), rgba(255,255,255,0.2) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.preview-btn:active::after, .design-btn:active::after {
+    opacity: 1;
+    transition: opacity 0s;
+}
+.preview-btn:active {
+    transform: scale(0.97);
+}
+.preview-btn.active {
+    box-shadow: 0 0 16px rgba(233, 69, 96, 0.4);
+}
+
+/* ===== ANIMATED HEADER ACCENT ===== */
+@keyframes headerGlow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+}
+
+/* ===== SECTION TRANSITIONS ===== */
+.tab-content {
+    animation: fadeSlideIn 0.25s ease-out;
+}
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== INPUT FOCUS GLOW ===== */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.15);
+}
+
+/* ===== UPLOAD BOX HOVER ===== */
+.upload-box {
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+}
+.upload-box:hover {
+    border-color: var(--accent);
+    background: rgba(233, 69, 96, 0.05);
+    transform: translateY(-1px);
+}
+
+/* ===== TEAM PRESET CHIPS ===== */
+.team-preset {
+    position: relative;
+    overflow: hidden;
+}
+.team-preset:active {
+    transform: scale(0.95);
+}
+
+/* ===== CARD SHADOW PULSE ON HOVER ===== */
+.card-flipper:hover .card-container {
+    filter:
+        drop-shadow(0 2px 4px rgba(0,0,0,0.3))
+        drop-shadow(0 12px 32px rgba(0,0,0,0.35))
+        drop-shadow(0 20px 60px rgba(0,0,0,0.2));
+}
+
+/* ===== LOADING OVERLAY ===== */
+.pdf-loading-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99998;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    gap: 16px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.pdf-loading-overlay.show { opacity: 1; }
+.pdf-loading-overlay .loading-spinner {
+    width: 48px;
+    height: 48px;
+    border-width: 5px;
+}
+.pdf-loading-overlay p {
+    color: white;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.pdf-loading-overlay .loading-subtext {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
 }
